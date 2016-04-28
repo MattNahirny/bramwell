@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bramwell and Associates</title>
+	<meta charset="UTF-8">
+	<link href="style/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<div id="adminButtonContainer">
+	<input type='button' value='Return to Main' onclick="redirect('main.html')" class='mainRedirectButton'>
+	</div>
+	
+	
+	<div id="editConstructionInfo" class="adminChoiceContainer">
+	
+		<div id="editConstructInfoChoiceContainer">
+			<input type="button" id="btnFlatLand" value="Bare Land">
+			<input type="button" id="btnComplex" value="Complex">
+			<input type="button" id="btnTownHouse" value="Town House">
+			<input type="button" id="btnAll" value="All">
+		</div>
+		<div id="displayBuildingType">
+		</div>
+		<table id="editConstructTable">
+			<tr>
+				<th>Info Type</th>
+				<th>Building Type</th>
+				<th>Comment</th>
+				<th> </th>
+			</tr>
+		</table>
+		
+		<div id="editConstructInfoContainer">
+			<input type="button" id="addConstructInfo" value="Add Dropdown">
+			<input type="button" class="btnCancel" value="Return">
+		</div>
+	</div>
+	
+	
+	<div id="createUserContainer" class="adminChoiceContainer">
+		<form name="createUserForm">
+			<label class="bold">Create User: </label>
+			<div class="moduleChoiceGroup">					
+				<div class="inputRow"><label>Username: </label><input type="text" id="inputUsername"></div>
+				<div class="inputRow"><label>Temporary Password: </label><input type="text" id="inputPassword"></div>
+				<div class="inputRow"><label>Email: </label><input type="text" id="inputUserEmail"></div>
+				<div class="inputRow"><label>Access Level: </label>
+				<select type="text" id="inputAccessLevel">
+					<option value="1">1: Clients</option>
+					<option value="2">2: Inspectors</option>
+					<option value="3">3: Costing</option>
+					<option value="4">4: Admin. Assistant</option>
+					<option value="5">5: All Access</option>
+				</select>
+				</div>
+			</div>
+			<input type="button" class="btnCancel" value="Cancel and Return">
+			<input type="button" class="save" onclick="submitUser()" value="Save and Continue">
+		</form>
+	</div>
+	
+	<div id="editUserContainer" class="adminChoiceContainer">
+		<table id="editUserTable">
+			<tr>
+				<th>User ID</th>
+				<th>Username</th>
+				<th>Email</th>
+				<th>Access Level</th>
+				<th> </th>
+			</tr>
+		</table>
+		<div id="editUserButtonContainer">
+			<input type="button" class="btnCancel" value="Cancel and Return">
+			<input type="button" id="btnSubmitUserUpdate" value="Save and Continue">
+		</div>
+	</div>
+	
+	<div id="createClientContainer" class="adminChoiceContainer">
+		<form name="moduleForm">
+				<label class="bold">Create Client: </label>
+				<div class="moduleChoiceGroup">					
+					<div class="inputRow"><label>First Name: </label><input type="text" id="inputPMFirstName"></div>
+					<div class="inputRow"><label>Last Name: </label><input type="text" id="inputPMLastName"></div>
+					<div class="inputRow"><label>Company Name: </label><input type="text" id="inputCompany"></div>
+					<div class="inputRow"><label>Address: </label><input type="text" id="inputAddress"></div>
+					<div class="inputRow"><label>City: </label><input type="text" id="inputCity"></div>
+				</div>
+				<input type="button" class="btnCancel" value="Cancel and Return">
+				<input type="button" class="save" onclick="submitClient()" value="Save and Continue">
+			</form>
+	</div>
+	
+	<div id="editClientContainer" class="adminChoiceContainer">
+		<table id="editClientTable">
+			<tr>
+				<th>Company ID</th>
+				<th>PM First Name</th>
+				<th>PM Last Name</th>
+				<th>Company</th>
+				<th>Address</th>
+				<th>City</th>
+				<th> </th>
+			</tr>
+		</table>
+        <div id="editClientButtonContainer">
+		<input type="button" class="btnCancel" value="Cancel and Return">
+		<input type="button" id="btnSubmitClientUpdate" value="Save and Continue">
+        </div>
+	</div>
+	
+	<div id="createInspectorContainer" class="adminChoiceContainer">
+		<form name="moduleForm">
+			<label class="bold">Create Inspector: </label>
+			<div class="moduleChoiceGroup">
+				<div class="inputRow"><label>First Name: </label><input type="text" id="inputInspectorFirstName"></div>
+				<div class="inputRow"><label>Last Name: </label><input type="text" id="inputInspectorLastName"></div>
+				<div class="inputRow"><label>Email: </label><input type="text" id="inputInspectorEmail"></div>
+				<div class="inputRow"><label>Phone: </label><input type="text" id="inputInspectorPhone"></div>
+				<div class="inputRow"><label>Cell: </label><input type="text" id="inputInspectorCell"></div>
+			</div>
+			
+			<input type="button" class="btnCancel" value="Cancel and Return">
+			<input type="button" class="save" onclick="submitInspector()" value="Save and Continue">
+			
+		</form>
+	</div>
+	
+	<div id="editInspectorContainer" class="adminChoiceContainer">
+		<table id="editInspectorTable">
+			<tr>
+				<th>Inspector ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Email</th>
+				<th>Phone</th>
+				<th>Cell</th>
+				<th> </th>
+			</tr>
+		</table>
+        <div id="editInspectorButtonContainer">
+		<input type="button" class="btnCancel" value="Cancel and Return">
+		<input type="button" id="btnSubmitInspectorUpdate" value="Save and Continue">
+        </div>
+	</div>
+	
+</body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="script/script.js"></script>
+	<script type="text/javascript" src="script/admin.js"></script>
+
+</html>

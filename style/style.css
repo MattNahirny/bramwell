@@ -1,0 +1,616 @@
+body {
+	    font: normal 13px/20px Verdana, Tahoma, sans-serif; 
+}
+
+.{
+	text-decoration: none;
+	font-weight:bold;
+	color: #205bc7;
+	display: inline-flex;
+	border: solid 1px #333333;
+	outline: 0;
+	width: 165px;
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+	margin-left: 50px;
+	-moz-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px;
+	-webkit-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px;
+	box-shadow: rgba(33,104,201, 0.2) 0px 0px 8px;
+}
+
+/*------------------ START OF CREATE / ADD MODULE CSS -------------*/
+input, textarea{
+	color:#205bc7;
+    padding: 2px;
+    border: solid 1px #2168c9; 
+    outline: 0; 
+    
+    background: #FFFFFF;
+    -moz-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px; 
+    -webkit-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px;
+	box-shadow: rgba(33,104,201, 0.2) 0px 0px 8px;
+}
+
+input[type=text]:not(.optionalService):not(#logInContainer input), textarea{ 
+	width: 300px; 
+}
+
+input[type=number], input[type=date] {
+	width:150px;
+}
+#reportDetails input[type=button]{
+	float:right;
+	
+} 
+input[type=button]{
+	width:150px;
+	
+}
+input[type=checkbox]{
+	width:20px;
+}
+.optionalService{
+	width:150px;
+}
+
+input:hover, textarea:hover, 
+input:focus, textarea:focus {
+	color:#000;
+    border-color: #333333; 
+	-webkit-box-shadow: rgba(98,120,225,0.34) 0px 0px 8px;
+	} 
+	
+.bold {
+	margin-left:5%;
+	font-weight:bold;
+	width:35%;
+}
+
+.levelNameInput{
+	display:none;
+}
+
+#moduleSelection, #module, #moduleConfirmation,  #buildingDetails, #buildingTypeSelect, #propertyStatistics, #constructionInfo{
+	display:none;
+}
+
+#reportIndex li:hover{
+	cursor:pointer;
+}
+
+.selectServices{
+	width:100%;
+}
+
+/*------------------ START CREATE -----------------------*/
+
+
+
+.currentIndex{
+	color:#333;
+	font-size:1.2em;
+	font-weight:700;
+}
+
+.notCurrentIndex{
+	color:#205bc7;
+	font-size:1em;
+}
+
+#reportIndex {
+	font-weight:550;
+	z-index:10px;
+	left:50px;
+	top: 20px;
+	width:255px;
+	float:left;
+
+}
+#reportIndex li{
+	list-style-type:none;
+}
+
+.phase{
+	overflow:hidden;
+	border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+	width:625px;
+	margin: 35px;
+	padding: 30px 10px 30px 10px;
+}
+
+
+#reportDetails > span:not(#selectInspectorContainer):not(#dateOfInspectionContainer){
+    display:inline-block;
+	margin-right:80px;
+    margin-bottom: 10px;
+}
+
+#constructionInfo textarea {
+	width:550px;
+	margin:10px;
+}
+
+#constructionInfo .choiceDropDown{
+	width:600px;
+}
+
+#constructionInfo label {
+	width:50%;
+}
+.selectInspector, .inputDateOfInspect {
+	margin-right:20px;
+	margin-bottom:8px;
+}
+
+.phase > label:not(.bold), .phase > div > label:not(.choiceContainerTitle){
+	margin-left:5%;
+    display:inline-block;
+    width: 30%;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+
+#propertyDesciption > span{
+	margin-left:25px;
+}
+
+#moduleNumberSection > div > * {
+	display: inline-block;
+	width: 30%;
+}
+
+#buildingSelectContainer> span > input{
+	padding: 10px 15px 10px 15px;	
+}
+
+#inputOpenService1Value, #inputOpenService2Value {
+	margin-left:9px;
+}
+
+.openValueCheckbox {
+	margin-left:5%;
+}
+
+/* This is for making the Construction Info and Module unique text boxes not show until a value has been selected from the dropdown
+   Feel free to get rid of it, so long as those things are set to not display */
+.commentContainer{
+	display:none;
+}
+#btnReportDetailsFinish {
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+}
+.saveExitButton, .saveContinueButton, .cancelButton{
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+	margin-left:15%;
+}
+.saveExitButton:hover, .saveContinueButton:hover, .cancelButton:hover{
+	-webkit-transform: scale(1.02) translateY(-2px);
+	z-index: 1;
+}
+#btnModuleConfirmBack, #btnModuleConfirmExit, #btnModuleConfirmFin, #btnModuleBack, #btnModuleExit, #btnModuleFin {
+	padding: 10px 15px 10px 15px;
+	margin-top:2%;
+	margin-left:7%;
+}
+
+.Group, #moduleTable {
+	margin: 0px 0px 20px 7%;
+}
+.Group > .choiceContainer{
+	display:block;
+	margin: 0px 0px 5px 3%;
+}
+.standardChoiceContainer {
+	margin-left:8%;
+}
+.addCommentButton{
+	margin-top:8px;
+}
+.choiceContainerTitle {
+	font-weight: 600;
+}
+
+.choiceContainer {
+	display:block;
+}
+.commentContainer, .choiceDropDown{
+	margin-left:25px;
+}
+.moduleContainer{
+	padding-left:3%;
+	margin-bottom: 5px;
+}
+
+.groupContainer{
+	padding-left:6%;
+	margin-bottom: 5px;
+}
+
+.individualContainer{
+	padding-left:9%;
+	margin-bottom: 5px;
+}
+
+.sub-elementTitle{
+	display:flex;
+	justify-content:space-between;
+}
+
+
+.sub-elementContainer{
+	padding-left:12%;
+	margin-bottom: 5px;
+}
+
+#moduleNumberSection >.choiceContainer> label{
+	margin-left: 5%;
+    display: inline-block;
+	width:30%;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+
+#noteSection > label{
+	margin-left: 5%;
+    display: inline-block;
+	width:10%;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+.writeOwn {
+	margin-left:7.5%;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+
+label.choiceContainer {
+	margin-left: 4%;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+label#imageCaption {
+	margin-left: 5%;
+	margin-right: 35px;
+    vertical-align: top;
+}
+div#captionContainer {
+	margin-bottom:13px;
+}
+input#imageUpload {
+	border:none !important;
+	padding: 0 !important; 
+    width: auto !important; 
+	box-shadow: initial;
+	margin-bottom:10px;
+	
+}
+.btnAddImage {
+	margin-bottom:13px;
+}
+/*------------------ END CREATE -------------------------*/
+
+
+/*------------------ START CONTINUE -------------------------*/
+#reportTable {
+	margin:10% auto !important;
+	border-color: #333333;
+	
+}
+#reportSelection{
+	border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+	width:600px;
+	margin: 30px auto;
+	padding: 30px 10px 30px 10px;
+
+}
+
+#reportSelection th {
+	font-weight:600;
+}
+#reportSelection td {
+	text-align:center;
+}
+
+
+/*------------------ END CONTINUE -------------------------*/
+
+/*------------------ START ADDMODULE --------------------*/
+#createModuleContainer {
+	border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+	width:600px;
+	margin: 30px auto;
+	padding: 30px 10px 30px 10px;
+}
+
+.level {
+	margin-left:8%;
+	display:inline-block;
+	width: 20%;
+	margin-bottom:5px;
+}
+.createLevelButton {
+	margin-left:2%;
+}
+
+.addCommentButton {
+	margin-left:8%;
+}
+
+#save {
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+	margin-left:65%;
+	
+}
+
+#save:hover {
+	-webkit-transform: scale(1.02) translateY(-2px);
+	z-index: 1;
+}	
+
+#createModuleContainer input:not(.addCommentButton):not(#save) {
+	margin-left:1%;
+}
+
+#createModuleContainer label:not(.bold):not(.level){
+	margin-left: 8%;
+	display:inline-block;
+	width:35%;
+	vertical-align: middle;
+    margin-bottom: 5px;
+}
+
+
+.moduleChoiceGroup {
+	margin-bottom:13px;
+}
+/*------------------ END ADDMODULE ----------------------*/
+
+/*------------------ END OF CREATE / ADD MODULE CSS ---------------------*/
+
+/*------------------- START OF INDEX (LOGIN) CSS -------------------------*/
+#logInContainer{
+	border: thin solid #333333;
+	width: 525px;
+	margin: 10% auto;
+	padding: 25px 10px 30px 30px;
+}
+#logInContainer > input {
+	padding: 5px;
+
+}
+.submit {
+	color:#205bc7;
+	font-weight:bold;
+}
+.submit:hover {
+	color:#000000;
+	-webkit-transform: scale(1.01) translateY(-1px);
+	z-index: 1;
+}
+
+.imageContainer {
+	padding-bottom: 20px;	
+}
+
+.redirectContainer {
+	padding-top: 20px;
+}
+
+.redirectContainer> a {
+	text-decoration: none;
+	color:#205bc7;
+}
+.redirectContainer> a:hover {
+	color:#000;
+}
+
+/*------------------- END OF INDEX (LOGIN) CSS -------------------------*/
+
+/*------------------- START OF COSTING CSS -------------------------*/
+#costingWholeContainer {
+	width:800px;
+	margin: 10% auto;
+	padding: 20px;
+	border-style:solid;
+	border-width:thin;
+	border-color: #333333;
+	align-content:center;
+}
+
+#reportAdminButtonContainers input {
+	padding:15px;
+	margin: 10px;
+}
+#moduleCostingTable {
+	border-collapse:collapse;
+	margin: 0px auto 0px auto;
+	width:95%;
+}
+#moduleCostingTable > tr {
+	border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+}
+
+#moduleCostingTable > tr > td{
+	padding: 5px;
+	text-align:center;
+}
+#moduleCostingTable > tr > input {
+	vertical-align:middle;
+}
+
+#moduleCostingTable > tr > td > input {
+	width:100px;
+}
+
+#costingButtonContainer {
+	width:450px;
+	margin:auto;
+}
+
+#submitModuleSaveExit, #costingSave {
+	margin-left:7%;
+	margin-right:7%;
+}
+/*------------------- END OF COSTING CSS -------------------------*/
+
+/*------------------- START OF MAIN & ADMIN CSS -------------------------*/
+#mainButtonPanel:not(#createUser):not(#editUsers):not(#createClient):not(#editClients):not(#createInspector):not(#editInspectors):not(#editConstructInfo) {
+	border-style:solid;
+	border-width:thin;
+	border-color: #333333;
+	width:525px;
+	margin: 10% auto;
+	padding-top: 10px;
+	padding-right:20px;
+	padding-bottom:35px;
+}
+#adminButtonContainer {
+	border-style:solid;
+	border-width:thin;
+	border-color: #333333;
+	width:525px;
+	margin: 5% auto;
+	padding-top: 10px;
+	padding-right:20px;
+	padding-bottom:35px;
+}
+#mainButtonPanel>a, #createUser, #editUsers, #createClient, #editClients, #createInspector, #editInspectors, #editConstructInfo, .mainRedirectButton{
+	text-decoration: none;
+	font-weight:bold;
+	color: #205bc7;
+	display: inline-flex;
+	border: solid 1px #333333;
+	outline: 0;
+	width: 165px;
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+	margin-left: 50px;
+	-moz-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px;
+	-webkit-box-shadow: rgba(33,104,201, 0.08) 0px 0px 8px;
+	box-shadow: rgba(33,104,201, 0.2) 0px 0px 8px;
+}
+#mainButtonPanel > a:hover, #createUser:hover, #editUsers:hover, #createClient:hover, #editClients:hover, #createInspector:hover, #editInspectors:hover, #editConstructInfo:hover, .mainRedirectButton:hover {
+	-webkit-transform: scale(1.02) translateY(-2px);
+	z-index: 1;
+	 border-color: #68A0E1; 
+	-webkit-box-shadow: rgba(98,120,225,0.34) 0px 0px 8px;
+	color:#000000;
+	border: 0 none;
+}
+
+
+/*------------------- START OF JUST ADMIN CSS -------------------------*/
+.adminChoiceContainer{
+	display:none;
+	padding:25px;
+	border-style:solid;
+	border-width:thin;
+	border-color: #333333;
+	margin: 10% 5%;
+	width: auto;
+}
+
+#createUserContainer, #createClientContainer, #createInspectorContainer {
+	width:525px;
+	margin: 10% auto;
+}
+#editUserContainer, #editClientContainer, #editInspectorContainer {
+	padding-top:20px;
+	padding-bottom:20px;
+	border-right:none;
+	border-left:none;
+}
+#editConstructionInfo {
+	width:625px;
+	margin:10% auto;
+ }
+
+#createUser, #editUsers, #createClient, #editClients, #createInspector, #editInspectors, #editConstructInfo {
+	width:435px;
+}
+
+.moduleChoiceGroup > .inputRow > label:not(.bold):not(.level){
+	margin-left:5%;
+    display:inline-block;
+    width: 25%;
+    vertical-align: bottom;
+    margin-bottom: 10px;
+}
+
+.save, .btnCancel, #btnSubmitUserUpdate, #btnSubmitClientUpdate, #btnSubmitInspectorUpdate{
+	padding: 10px 15px 10px 15px;
+	margin-top:5%;
+	margin-left:7%;
+	margin-right:7%;
+}
+#editUserButtonContainer, #editClientButtonContainer, #editInspectorButtonContainer {
+	width: 525px;
+	margin:auto;
+}
+
+#btnFlatLand, #btnComplex, #btnTownHome, #btnCustom, #btnTownHouse, #btnAll{
+	padding: 10px 15px 10px 15px;
+	margin-top:2%;
+}
+
+#editConstructInfoChoiceContainer {
+	text-align:center;
+}
+
+.save:hover, .btnCancel:hover, #btnSubmitUserUpdate:hover, #btnSubmitClientUpdate:hover, #btnSubmitInspectorUpdate:hover, #btnFlatLand:hover, #btnComplex:hover, #btnTownHome:hover, #btnTownHouse:hover, #btnAll:hover, #btnCustom:hover{
+	-webkit-transform: scale(1.02) translateY(-2px);
+	z-index: 1;
+}
+
+td.accessLevel, td.userID, td.clientID, td.inspectorID {
+	text-align:center;
+}
+
+.editUserRow, .editClientRow, .editInspectorRow{
+	margin-left: 15px;
+}
+
+#editUserTable, #editClientTable, #editInspectorTable {
+	margin:auto;
+}
+
+#editUserTable td, #editClientTable td, #editInspectorTable td {
+	padding:7.5px;
+}
+
+.deleteConstRow, #submitConstructInfo{
+	margin-left: 15px;
+}
+/*------------------- END OF JUST ADMIN CSS -------------------------*/
+
+
+/*-------------------- START OF VIEW CSS ------------------------------*/
+#viewContainer {
+	margin: 10% auto;
+        width: 775px;
+}
+#viewReportTable td{
+	text-align:center;
+}
+.selectReportButton {
+	margin-left: 10%;
+        margin-right: 10%;
+}
+
+/*-------------------- END OF VIEW CSS --------------------------------*/
+/*------------------- END OF MAIN & ADMIN CSS -------------------------*/
+
+
+
+
