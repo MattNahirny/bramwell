@@ -2,10 +2,11 @@
 
 
 //input controller
-$servername = "198.71.227.98:3306";
-$dbname = "bramwell";
-$username = "bramwell";
-$password = "Pdt9h8!3";
+//$servername = "198.71.227.98:3306";
+//$dbname = "bramwell";
+//$username = "bramwell";
+//$password = "Pdt9h8!3";
+include_once("db.php");
 
 	try {
 		$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, array(
