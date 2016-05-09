@@ -13,18 +13,44 @@
 				$return = "";
 				switch($accessLevel){
 					
-					case 9: case 8: case 7: case 6: case 5:
-						$return .= "<a href='admin.html'>Admin Tools</a>";
+                                        /*accessLevel
+                                         6= Amdinistrator
+                                         5= Assistant
+                                         4= Estimator
+                                         3= Inpsector with Costing
+                                         2= Inspector
+                                         1= Property Manager* 
+                                         */
+                                        case 6:
+                                                $return .= "<a href='admin.html'>Administrative Tools</a>";
+                                                $return .= "<a href='admin.html'>Client/Inspector Tools</a>";
+                                                $return .= "<a href='costing.html'>Adjust Costing</a>";
+                                                $return .= "<a href='addmodule.html'>Add Components</a>";
+                                                $return .= "<a href='continue.html'>Continue Report</a>";
+						$return .= "<a href='create.html'>Create Report</a>";
+                                                $return .= "<a href='view.html'>View Report(s)</a>";
+                                                break;
+                                        case 5:
+                                                $return .= "<a href= 'admin.html'>Administrative Tools</a>";
+                                                $return .= "<a href= 'view.html'>View Report(s)</a>";
 					case 4:
 						$return .= "<a href='admin.html'>Client/Inspector Tools</a>";
+                                                $return .= "<a href='costing.html'>Adjust Costing</a>";
+                                                $return .= "<a href='addmodule.html'>Add Components</a>";
+                                                break;
 					case 3:
 						$return .= "<a href='costing.html'>Adjust Costing</a>";
 						$return .= "<a href='addmodule.html'>Add Components</a>";
+                                                $return .= "<a href='continue.html'>Continue Report</a>";
+						$return .= "<a href='create.html'>Create Report</a>";
+                                                break;
 					case 2:
 						$return .= "<a href='continue.html'>Continue Report</a>";
 						$return .= "<a href='create.html'>Create Report</a>";
+                                                break;
 					case 1:
 						$return .= "<a href='view.html'>View Report(s)</a>";
+                                                break;
 				}
 				echo $return;
 			break;
@@ -58,15 +84,15 @@
 			case "admin":
 				$return = "";
 				switch($accessLevel){
-					case 9: case 8: case 7: case 6: case 5:
+					case 6: case 5:
 						$return .= "<div ><input id='createUser' type='button' value='Create User'></input></div>
-									<div ><input id='editUsers' type='button' value='Edit Users'></input></div>";
+							    <div ><input id='editUsers' type='button' value='Edit Users'></input></div>";
 					case 4:
 						$return .= "<div><input id='createClient' type='button' value='Create Client'></input></div>
-									<div><input id='editClients' type='button' value='Edit Clients'></input></div>
-									<div><input id='createInspector' type='button' value='Create Inspector'></input></div>
-									<div><input id='editInspectors' type='button' value='Edit Inspector'></input></div>
-									<div><input id='editConstructInfo' type='button' value='Construction Dropdowns'></input></div>";
+                                                            <div><input id='editClients' type='button' value='Edit Clients'></input></div>
+                                                            <div><input id='createInspector' type='button' value='Create Inspector'></input></div>
+                                                            <div><input id='editInspectors' type='button' value='Edit Inspector'></input></div>
+                                                            <div><input id='editConstructInfo' type='button' value='Construction Dropdowns'></input></div>";
 									
 				}
 				echo $return;

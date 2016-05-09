@@ -53,7 +53,7 @@
 				
 				<div class="moduleChoiceGroup">
 					<div class="inputRow"><label class="bold">Physical Description:</label></div>
-						<div class="inputRow"><label>Standard Description:</label><textarea id="physicalDescStndDesc"></textarea></div>
+						<div class="inputRow"><label>Default Description:</label><textarea id="physicalDescStndDesc"></textarea></div>
 						<div class="standardCommentContainer" id="physicalDescComments">
 							
 						</div>
@@ -92,7 +92,7 @@
 					</div>
 					<div class="inputRow"><input type="button" class="addCommentButton" value="Add Comment" name="defAnalysis"></div>
 				</div>
-				
+                                <input type="button" id="cancelButton" value="Return to Menu" onclick="window.location.href='/main.html'">
 				<input type="button" id="save" onclick="submitNewModule()" value="Save and Continue">
 			</form>
 		</div>
