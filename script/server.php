@@ -1985,4 +1985,41 @@ function getViewableReports($conn){
 	return $rows;
 }
 
+
+
+
+//Function to return user data for Account management.
+function getUserData($conn){
+        $userID = getLoggedInID();
+        $sql ="SELECT * FROM user WHERE userID = " .$userID;
+        $sth = $conn->prepare($sql);
+        $sth->bindParam(':userID', $userID, PDO::PARAM_INT, 11);
+        $sth->execute();
+        $row;
+        while($r =$sth->fetch(PDO::FETCH_ASSOC)){
+            $row= $r;
+        }
+        
+        return $row;
+}
+
+function getAccessLevels($conn){
+
+	$sql = "SELECT  title FROM userrole";
+
+	$sth = $conn->prepare($sql);
+	$sth->execute();
+	$rows = array();
+	
+	while($r = $sth->fetch(PDO::FETCH_ASSOC)) {
+		$rows[] = $r;
+	}
+	return $rows;
+}
+
+
+//Function to terminate session.
+function logout(){
+    
+}
 ?>

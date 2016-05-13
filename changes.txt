@@ -3,3 +3,5 @@ Things I changed:
 	Changed html to use print.js not view.js
 	Added getviewable function
 	did view.js
+
+WHO WROTE THIS? -Sean

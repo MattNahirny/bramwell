@@ -343,15 +343,26 @@ input#imageUpload {
 .addCommentButton {
 	margin-left:8%;
 }
+#navigationButtonDiv{
+    	width:450px;
+	margin:auto;
+        display:inline;
+}
 
 #save {
 	padding: 10px 15px 10px 15px;
 	margin-top:5%;
-	margin-left:65%;
+	margin-left:45%;
 	
 }
 
-#save:hover {
+#cancelButton {
+        padding: 10px 15px 10px 15px;
+        margin-top:5%;
+        margin-right:45%;
+}
+
+#save:hover #cancelButton:hover {
 	-webkit-transform: scale(1.02) translateY(-2px);
 	z-index: 1;
 }	

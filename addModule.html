@@ -92,8 +92,10 @@
 					</div>
 					<div class="inputRow"><input type="button" class="addCommentButton" value="Add Comment" name="defAnalysis"></div>
 				</div>
-                                <input type="button" id="cancelButton" value="Return to Menu" onclick="window.location.href='/main.html'">
-				<input type="button" id="save" onclick="submitNewModule()" value="Save and Continue">
+                                <div id="navigationButtonDiv">
+                                    <input type="button" id="cancelModuleButton" class="cancelButton" value="Return to Menu" onclick="window.location.href='/main.html'">
+                                    <input type="button" id="save" class="saveExitButton" onclick="submitNewModule()" value="Save and Continue">
+                                </div>
 			</form>
 		</div>
 		

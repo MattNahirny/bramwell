@@ -19,3 +19,15 @@ function getViews(){
 		alert('Error with the connection: ' + textStatus + " " + errorThrown);
 	});
 }
+
+
+//Working on a logout function
+
+/*
+function logout() {
+    var r = confirm("Do you really want to log out?");
+    if (r) {
+       window.location.href = 'logout.php'
+    }
+}
+*/
