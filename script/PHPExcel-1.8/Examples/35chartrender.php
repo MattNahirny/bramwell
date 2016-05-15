@@ -47,9 +47,8 @@ include 'PHPExcel/IOFactory.php';
 //		and its directory location on your server
 $rendererName = PHPExcel_Settings::CHART_RENDERER_JPGRAPH;
 $rendererLibrary = 'jpgraph3.5.0b1/src/';
-$rendererLibraryPath = dirname(__FILE__).'/PHPExcel/Tests/PDF/' . $rendererLibrary;
-
-
+$rendererLibraryPath = 'C:/Bitnami/wampstack-5.5.31-0/apache2/htdocs/bramwell/script/PHPExcel-1.8/Classes/PHPExcel/Chart/Renderer/' . $rendererLibrary;
+//echo $rendererLibraryPath;exit;
 if (!PHPExcel_Settings::setChartRenderer(
 		$rendererName,
 		$rendererLibraryPath

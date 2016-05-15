@@ -16,16 +16,6 @@ ini_set("display_errors", 1 );
 
 include_once('GenerateXlsx.php');
 
-/*
-for ($col = ord('B'); $col <= ord('Z'); $col++)
-{
-    $TallySheet->getColumnDimension(chr($col))->setAutoSize(true);
-}
-for ($col = ord('A'); $col <= ord('F'); $col++)
-{
-    $TallySheet->getColumnDimension('A' . chr($col))->setAutoSize(true);
-}
-*/
 
 $excelmaker = new GenerateXlsx($conn, 1);
 $excelmaker->run();
