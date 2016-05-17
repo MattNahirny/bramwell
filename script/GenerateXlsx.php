@@ -551,7 +551,6 @@ class GenerateXlsx
         for($i = (5 + $curRow); $i < (10 + $curRow); $i++)
         {
             //echo 'hello' . $i . $importantinfo[($i - 5 - $curRow)]['A'] . $importantinfo[($i - 5 - $curRow)]['C'] . '<br>';
-            echo 'A' . ($i - 5 - $curRow);
             $this->SchedASheet->SetCellValue('A' . $i, $importantinfo[($i - 5 - $curRow)]['A']);
             $this->SchedASheet->SetCellValue('C' . $i, $importantinfo[($i - 5 - $curRow)]['C']);
             $cursor = $i;
@@ -561,19 +560,21 @@ class GenerateXlsx
 
             array('A' => 'Benchmark Future Replacement Cost', 'E' => '=K16'),
             array('A' => 'Total Expenditures without allowances over 30 years', 'E' => '=\'Sched. C.1 TH\'!E33'),
-            array('A' => 'Year 1 Total Allowances', '=Q16'),
+            array('A' => 'Year 1 Total Allowances', 'E' => '=Q16'),
             array('A' => 'Total Allowances over Future Replacement Cost', 'E' => '=Q16/K16'),
             array('A' => 'Percent Allowances over Current Replacement Cost', 'E' => '=Q16/L16'),
             array('A' => 'If Development Began today per year RF Recommended Contributions per average lot:', 'E' => '=O16/\'Basic Info\'!C3'),
-            array('A' => 'If Development began today per month RF Contributions per average lot:\', \'E\' => \'=E32/12'),
+            array('A' => 'If Development began today per month RF Contributions per average lot:', 'E' => '=E32/12'),
             array('A' => 'Current per month RF Contributions per average lot:', 'E' => '=(\'Basic Info\'!D26/\'Basic Info\'!C3)/12'),
             array('A' => 'Annual Expenditures Increase = (Future Replacement Cost/(Current Replacement Cost - 1)/30):', 'E' => '=(K16/J16-1)/30')
 
 
         );
-        $this->SchedASheet->SetCellValue('A' . $cursor + 1, 'BENCHMARK FULL FUNDING ANALYSIS');
+
+        $this->SchedASheet->SetCellValue('A' . ($cursor + 1), 'BENCHMARK FULL FUNDING ANALYSIS');
         $cursor++;
-        for($i = 0; $i < 10; $i++)
+
+        for($i = 0; $i < 9; $i++)
         {
             $this->SchedASheet->SetCellValue('A' . $cursor, $benchmark[$i]['A']);
             $this->SchedASheet->SetCellValue('A' . $cursor, $benchmark[$i]['E']);
