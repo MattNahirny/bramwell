@@ -15,21 +15,135 @@ class GenerateXlsx
         $this->planID = $planID;
         $this->PHPExcel = new PHPExcel();
         $this->allTallyData = array();
-        $this->basicInfoQuery = '';
         $this->numComponents = 0;
+        $this->basicInfoQuery = '';
+        $this->allComponents = array();
+
+
         $this->tallyQuery = 'SELECT levelone.Name AS "l1Name", levelfour.Name AS "l4Name", plancomponent.YearAcquired, levelfour.ExpectedLifespan, plancomponent.NumUnits, plancomponent.UnitOfMeasure, levelfour.Cost  
-    FROM plan 
-    INNER JOIN plancomponent
-    ON plan.PlanId = plancomponent.PlanId
-    INNER JOIN levelfour
-    ON plancomponent.LevelFourId = levelfour.LevelFourId
-    INNER JOIN levelthree
-    ON levelfour.LevelThreeId = levelthree.LevelThreeId
-    INNER JOIN leveltwo
-    ON levelthree.LevelTwoId = leveltwo.LevelTwoId
-	INNER JOIN levelone
-    ON leveltwo.LevelOneId = levelone.LevelOneId
-    WHERE plan.PlanId = :planID';
+                                FROM plan
+                                INNER JOIN plancomponent
+                                ON plan.PlanId = plancomponent.PlanId
+                                INNER JOIN levelfour
+                                ON plancomponent.LevelFourId = levelfour.LevelFourId
+                                INNER JOIN levelthree
+                                ON levelfour.LevelThreeId = levelthree.LevelThreeId
+                                INNER JOIN leveltwo
+                                ON levelthree.LevelTwoId = leveltwo.LevelTwoId
+	                            INNER JOIN levelone
+                                ON leveltwo.LevelOneId = levelone.LevelOneId
+                                WHERE plan.PlanId = :planID';
+
+        $this->aux = array();
+
+        // sched c1 th,   F15
+        $this->aux['AnnualReserveFundContributions'][0] = array('year'=>2014, 'value'=>2400);
+        // sched c1 th,   G15
+        $this->aux['AnnualReserveFundContributions'][1] = array('year'=>2015, 'value'=>2640);
+        // sched c1 th,   L19
+        $this->aux['AnnualReserveFundContributions'][2] = array('year'=>2020, 'value'=>51961);
+//pg 6
+        // i think it on the loop to get the compoenents.. u have a cout for it if iremember.
+        $this->aux['ReserveFundGroups'][0] = array('name'=>'Site Improvements Reserve Components', 'total'=>10);
+        // can be any number of level1 total, name. COUNT for each level1 id
+        $this->aux['ReserveFundGroups'][1] = array('name'=>'Consultant Report', 'total'=>1);
+        // basic info,    C17
+        $this->aux['Year1ReserveAdequacy']        = "37";
+        // basic info,    C18
+        $this->aux['Year30ReserveAdequacy']       = "60";
+        // sched A,    J16
+        $this->aux['CurrentReplacementCost']      = "162713";
+        // sched A,    K16
+        $this->aux['FutureReplacementCost']       = "501654";
+        // sched A,    L16
+        $this->aux['CurrentReserveFundCostReq']   = "63643";
+        // sched A,    M16
+        $this->aux['FutureReserveFundAcc']        = "95298";
+        // sched A,    N16
+        $this->aux['FutureReserveFundReq']        = "406356";
+        // sched A,    O16
+        $this->aux['ReserveFundAnnualCon']        = "10218";
+//pg 16
+        // sched c1 th,     F15
+        $this->aux['ReserveFundClosingBalance'][0] = array('date'=>'2013-12-31', 'value'=>22027);
+        // sched C1 CFT,    C4
+        $this->aux['RecommendedAnnualRFContr'] = "1500";
+        // sched C1 CFT,    F41
+        $this->aux['ReserveAdequacy'] = "37";
+        // ? C1 TH
+        $this->aux['MonthlyASLContributions'][0] = array('year'=>'2014', 'value'=>20.00);
+        // ?
+        $this->aux['MonthlyASLContributions'][1] = array('year'=>'2019', 'value'=>32.21);
+//pg65
+        // ?
+        $this->aux['MonthlyASLContributions'][2] = array('year'=>'2015', 'value'=>22.00);
+//pg 60
+
+        $this->aux['OpeningBalanceDate'] = "2014-01-01";
+
+        $this->aux['OpeningBalanceValue'] = "22027";
+
+        $this->aux['CurrentBudgetedAnnualRFC'] = "2400";
+
+        $this->aux['AuthorizedSpecialLeveies'] = "0";
+
+        $this->aux['Borrowings'] = "0";
+
+        $this->aux['LoanRefinance'] = "0";
+
+        $this->aux['ReserveFundTaxFreeAnnualIntIncome'] = "330";
+
+        $this->aux['LessRepaymentOfFinancingLoan'] = "0";
+
+        $this->aux['LessReserveFundBudgetCurrentFYear'] = "-1575";
+
+        $this->aux['ProjectedReserveFundBalanceDate'] = "2014-12-31";
+
+        $this->aux['ProjectedReserveFundBalanceValue'] = "23182";
+
+        $this->aux['EstimatedReserveFund_Shortfall'] = "62068";
+
+        $this->aux['BudgetTransferFromDate'] = "2015-01-01";
+
+        $this->aux['BudgetTransferFromValue'] = "6000";
+
+        $this->aux['ProposedSpecialLeveiesDate'] = "2015-01-01";
+
+        $this->aux['ProposedSpecialLeveiesValue'] = "33468";
+
+        $this->aux['EstimatedReserveFundAdequacy'] = "100";
+//pg62
+
+        $this->aux['EstimatedReserveFundDeficiency'] = "38885";
+
+        $this->aux['ReserveAdequacyDate'] = "2014-12-31";
+
+        $this->aux['ReserveAdequacyValue'] = "37";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -44,6 +158,7 @@ class GenerateXlsx
         $this->getTally();
         $this->getComparison();
         $this->getScheduleA();
+        $this->getScheduleC1TH();
         $this->save();
     }
 
@@ -100,28 +215,45 @@ class GenerateXlsx
         //{
             $r['strata'] = 'Strata ID';
             $r['numLots'] = 20;
+            $r['entUnits'] = 0;
             $r['amenities'] = 0;
             $r['yearAcquired'] = 1970;
             $r['currentYear'] = date('Y');
             $r['fiscalYearEnd'] = '28-feb';
+            $r['THCurApprovedIncrease'] = 0;
+            $r['THYr1PropIncrease'] = 0;
             $r['C1C2proposedContribution'] = '5%';
             $r['C3proposedContribution'] = '1%';
+            $r['C1C2PropRFConrtibution'] = 0;
             $r['constructionInflation'] = '3%';
+            $r['SchedBInterestRate'] = 0;
             $r['invenstmentInterest'] = '1%';
+            $r['C1THYr1RA'] = 0;
+            $r['C1THYr30RA'] = 0;
+            $r['MaxRFContribution'] = 10000;
             $dataRows = $r;
             //$this->dummp($dataRows);
         //}
 
         $this->BasicInfoSheet->SetCellValue('C2', $dataRows['strata']);
         $this->BasicInfoSheet->SetCellValue('C3', $dataRows['numLots']);
+        $this->BasicInfoSheet->SetCellValue('C4', $dataRows['entUnits']);
         $this->BasicInfoSheet->SetCellValue('C5', $dataRows['amenities']);
         $this->BasicInfoSheet->SetCellValue('C6', $dataRows['yearAcquired']);
         $this->BasicInfoSheet->SetCellValue('C7', $dataRows['currentYear']);
         $this->BasicInfoSheet->SetCellValue('C8', $dataRows['fiscalYearEnd']);
+        $this->BasicInfoSheet->SetCellValue('C9', $dataRows['THCurApprovedIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C10', $dataRows['THYr1PropIncrease']);
         $this->BasicInfoSheet->SetCellValue('C11', $dataRows['C1C2proposedContribution']);
         $this->BasicInfoSheet->SetCellValue('C12', $dataRows['C3proposedContribution']);
+        $this->BasicInfoSheet->SetCellValue('C13', $dataRows['C1C2PropRFConrtibution']);
         $this->BasicInfoSheet->SetCellValue('C14', $dataRows['constructionInflation']);
+        $this->BasicInfoSheet->SetCellValue('C15', $dataRows['SchedBInterestRate']);
         $this->BasicInfoSheet->SetCellValue('C16', $dataRows['invenstmentInterest']);
+        $this->BasicInfoSheet->SetCellValue('C17', $dataRows['C1THYr1RA']);
+        $this->BasicInfoSheet->SetCellValue('C18', $dataRows['C1THYr30RA']);
+        $this->BasicInfoSheet->SetCellValue('C19', $dataRows['MaxRFContribution']);
+
     }
 
     function setupBasicInfo()
@@ -142,7 +274,8 @@ class GenerateXlsx
             'Strata Corporation Sched. B Average Interest Rate:',
             'Investment Interest Rate:',
             'Strata Corporation C.1 Threshold Year 1 Reserve Adequacy',
-            'Strata Corporation C.1 Threshold Year 30 Reserve Adequacy');
+            'Strata Corporation C.1 Threshold Year 30 Reserve Adequacy',
+            'Maximum Reserve Fund Contributions');
 
         $columnA_2 = array(
             'Total Strata Fees',
@@ -274,11 +407,12 @@ class GenerateXlsx
                     '*\'Basic Info\'!$C$16/((1+\'Basic Info\'!$C$16)^G'. $curRow . '-1)');
                 $this->numComponents++;
                 $curRow++;
+                array_push($this->allComponents, $array['l4Name']);
             }
             $this->TallySheet->calculateColumnWidths();
         }
 
-        //$this->dummp($dataRows);
+        //$this->dummp($this->allComponents);
         if (count($dataRows) < 1) {
             echo "0 data";
             exit;
@@ -634,6 +768,166 @@ class GenerateXlsx
 
     function setupScheduleC1TH()
     {
+        //setup Titles starting at row 12
+        $this->SchedC1THSheet->SetCellValue('C12', 'First Occurrence');
+        $this->SchedC1THSheet->SetCellValue('D12', 'Repeat Every');
+        $this->SchedC1THSheet->SetCellValue('E12', 'Totals at Year 30 without Allowances');
+        $cellRange1 = range('G', 'Z');
+        $cellRange2 = range('B', 'I');
+        $curletter = 'F';
+        $this->SchedC1THSheet->SetCellValue('F12', '=\'Basic Info\'!C7+1');
+
+        foreach($cellRange1 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue($letter . 12, '=' . $curletter . '12 + 1');
+
+            $curletter = $letter;
+        }
+        $this->SchedC1THSheet->SetCellValue('AA12', '=Z12 + 1');
+        $curletter = 'A';
+        foreach($cellRange2 as $letter)
+        {
+            //echo 'A' . $letter . 12, '=A' . $curletter . '12 + 1';exit;
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 12, '=A' . $curletter . '12 + 1');
+            $curletter = $letter;
+        }
+
+        //setup titles A14-A19
+        $titles = array(
+            'Reserve Fund Opening Balance',
+            'Annual Reserve Fund Contributions',
+            'Possible Special Levies',
+            'Possible Borrowings',
+            'Annual Reserve Fund Interest Income',
+            'Total Cash Resources'
+        );
+        for ($i = 0; $i < 6; $i++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . ($i + 14), $titles[$i]);
+        }
+        $this->SchedC1THSheet->SetCellValue('A21', 'Reserve Expenditures');
+        //list components by L4Name
+        for ($i = 0; $i < $this->numComponents; $i++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . (22 + $i), ($i + 1));
+            $this->SchedC1THSheet->SetCellValue('B' . (22 + $i), $this->allComponents[$i]);
+            $cursor = 22 + $i;
+        }
+        $cursor += 2;
+        //the totals
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Total Expenditures');
+        $totalExpendituresRow = $cursor;
+        $cursor += 2;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Fund Closing Balance');
+        $RFClosingBalanceRow = $cursor;
+        $cursor += 2;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Fund Requirements');
+        $RFRequirementseRow = $cursor;
+        $cursor += 2;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Surplus (Deficiency)');
+        $reserveSurplusDeficiencyRow = $cursor;
+        $cursor++;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Adequacy');
+        $reserveAdequacy = $cursor;
+        $cursor++;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Monthly ASL Contributions');
+        $monthlyASLContributionsRow = $cursor;
+        $cursor++;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Annual ASL Contributions');
+        $annualASLContributionsRow = $cursor;
+        $cursor++;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Annual ASL Possible Special Levies');
+        $annualPossibleSpecialLeviesRow = $cursor;
+        $cursor++;
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Total Annual ASL Contributions and Special Levies');
+        $totalASLContributionsSpecialLeviesRow = $cursor;
+//From E14 to AI19
+        //COLUMN F
+        $this->SchedC1THSheet->SetCellValue('E15', '=SUM(F15:AI15)');
+        $this->SchedC1THSheet->SetCellValue('E16', '=SUM(F16:AI16)');
+        $this->SchedC1THSheet->SetCellValue('E17', '=SUM(F17:AI17)');
+        $this->SchedC1THSheet->SetCellValue('E18', '=SUM(F18:AI18)');
+
+        $this->SchedC1THSheet->SetCellValue('F14', '36933'); //THESE HAVE TO BE ENTERED BY USER
+        $this->SchedC1THSheet->SetCellValue('F15', '5546'); // THESE HAVE TO BE ENTERED BY USER OR MOST LIKELY PUT INTO BASICINFO
+        $this->SchedC1THSheet->SetCellValue('F16', '0');
+        $this->SchedC1THSheet->SetCellValue('F17', '0');
+        $this->SchedC1THSheet->SetCellValue('F18', '=+F14*\'Basic Info\'!$C$16');
+        $this->SchedC1THSheet->SetCellValue('F19', '=+F14+F15+F16+F18');
+        $curletter = 'F';
+        $maxRFContribution = 10000;
+        //COLUMN G-Z
+        foreach($cellRange1 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue($letter . 14, '=+' . $curletter . $RFClosingBalanceRow);
+            //THERE IS A MAXIMUM ANNUAL RESERVE FUND CONTRIBUTION AMOUNT THAT MUST BE SET
+            $this->SchedC1THSheet->SetCellValue($letter . 15, '=IF((100%+\'Basic Info\'!$C$11)*' . $curletter . '15 <= \'Basic Info\'!$C$19,(100%+\'Basic Info\'!$C$11)*' . $curletter . '15,\'Basic Info\'!$C$19)'); // ANNUAL RESERVE FUND CONTRIBUTIONS MUST BE HERE
+            $this->SchedC1THSheet->SetCellValue($letter . 16, '0');
+            $this->SchedC1THSheet->SetCellValue($letter . 17, '0');
+            $this->SchedC1THSheet->SetCellValue($letter . 18, '=+' . $curletter . '14*\'Basic Info\'!$C$16');
+            $this->SchedC1THSheet->SetCellValue($letter . 19, '=+' . $curletter . '14+' . $curletter . '15+' . $curletter . '16+' . $curletter . '18');
+
+            $curletter = $letter;
+        }
+        //COLUMN AA
+        $this->SchedC1THSheet->SetCellValue('AA14', '=+Z' . $RFClosingBalanceRow);
+        $this->SchedC1THSheet->SetCellValue('AA15', '=IF((100%+\'Basic Info\'!$C$11)*' . $curletter . '15 <= \'Basic Info\'!$C$19,(100%+\'Basic Info\'!$C$11)*' . $curletter . '15,\'Basic Info\'!$C$19)');
+        $this->SchedC1THSheet->SetCellValue('AA16', '');
+        $this->SchedC1THSheet->SetCellValue('AA17', '0');
+        $this->SchedC1THSheet->SetCellValue('AA18', '=+AA14*\'Basic Info\'!$C$16');
+        $this->SchedC1THSheet->SetCellValue('AA19', '=+AA14+AA15+AA16+AA18');
+        $curletter = 'A';
+        //COLUMN AB-AI
+        foreach($cellRange2 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 14, '=+A' . $curletter . $RFClosingBalanceRow);
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 15, '=IF((100%+\'Basic Info\'!$C$11)*A' . $curletter . '15 <= \'Basic Info\'!$C$19,(100%+\'Basic Info\'!$C$11)*A' . $curletter . '15,\'Basic Info\'!$C$19)');
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 16, '0');
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 17, '0');
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 18, '=+A' . $curletter . '14*\'Basic Info\'!$C$16');
+            $this->SchedC1THSheet->SetCellValue('A' . $letter . 19, '=+A' . $curletter . '14+A' . $curletter . '15+A' . $curletter . '16+A' . $curletter . '18');
+
+            $curletter = $letter;
+        }
+        $cellRange3 = range('F', 'Z');
+        //CALCULATE TOTALS FOR EACH COMPONENT
+        for ($i = 0; $i < $this->numComponents; $i++)
+        {
+            $this->SchedC1THSheet->SetCellValue('C' . (22 + $i), '=\'Basic Info\'!$C$7+\'Sched. A\'!F'. ($i + 4));
+            $this->SchedC1THSheet->SetCellValue('D' . (22 + $i), '=\'Sched. A\'!D'. ($i + 4));
+            $this->SchedC1THSheet->SetCellValue('E' . (22 + $i), 'SUM(F' . (22 + $i). ':AI' . (22 + $i) . ')');
+            $replaceEvery = $this->SchedC1THSheet->getCell('D' . (22 + $i))->getCalculatedValue();
+            $replaced = false;
+            $yearsAfter = 0;
+            $replaceLetter = '';
+            foreach($cellRange3 as $letter)
+            {
+
+                if (!$replaced)
+                {
+                    $this->SchedC1THSheet->SetCellValue($letter . (22 + $i), '=IF(' . $letter . '$12=$C' . (22 + $i). ',\'Sched. A\'!$K4,0)');
+                    if ($this->SchedC1THSheet->getCell($letter . '12')->getCalculatedValue() ==
+                    $this->SchedC1THSheet->getCell('C' . (22 + $i))->getCalculatedValue())
+                    {
+                        $replaced = true;
+                        $replaceLetter = $letter;
+                    }
+                }
+                else
+                {
+                    $yearsAfter++;
+                    if ($yearsAfter % $replaceEvery == 0)
+                    {
+                        $this->SchedC1THSheet->SetCellValue($letter . (22 + $i), '=' . $replaceLetter . (22 + $i) . '*(1+\'Basic Info\'!C14)^' . $replaceEvery);
+                        $replaceLetter = $letter;
+                    }
+                    else
+                    {
+                        $this->SchedC1THSheet->SetCellValue($letter . (22 + $i), 0);
+                    }
+                }
+            }
+        }
 
     }
 
