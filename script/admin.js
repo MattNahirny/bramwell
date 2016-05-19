@@ -378,7 +378,6 @@ function submitClient(){
 					
 	var firstName = document.getElementById("inputPMFirstName").value;
 	var lastName = document.getElementById("inputPMLastName").value;
-        var title = document.getElementById("inputTitle").value;
 	var company = document.getElementById("inputCompany").value;
 	var address = document.getElementById("inputAddress").value;
 	var city = document.getElementById("inputCity").value;
@@ -387,7 +386,6 @@ function submitClient(){
 		"request" : "submitClient",
 		"firstName" : firstName,
 		"lastName" : lastName,
-                "title" : title,
 		"company" : company,
 		"address" : address,
 		"city" : city
@@ -428,8 +426,7 @@ function prepareEditClientTable(){
 			$("#" + clientRowID).append("<td class='clientID'>" + data[count]['ClientId'] + "</td>");
 			$("#" + clientRowID).append("<td class='firstName'>" + data[count]['PMFirstName'] + "</td>");
 			$("#" + clientRowID).append("<td class='lastName'>" + data[count]['PMLastName'] + "</td>");
-			$("#" + clientRowID).append("<td class='title'>" + data[count]['Title'] + "</td>");
-                        
+			
 			$("#" + clientRowID).append("<td class='company'>" + data[count]['CompanyName'] + "</td>");
 			$("#" + clientRowID).append("<td class='address'>" + data[count]['Address'] + "</td>");
 			$("#" + clientRowID).append("<td class='city'>" + data[count]['City'] + "</td>");
@@ -450,7 +447,6 @@ function prepareEditClientTable(){
 				$(this).attr("value", "Finish");
 				var currentFirstName = $(this).parent().siblings('.firstName').text();
 				var currentLastName = $(this).parent().siblings('.lastName').text();
-                                var currentTitle = $(this).parent().siblings('.title').text();
 				var currentCompany = $(this).parent().siblings('.company').text();
 				var currentAddress = $(this).parent().siblings('.address').text();
 				var currentCity = $(this).parent().siblings('.city').text();
@@ -463,10 +459,6 @@ function prepareEditClientTable(){
 				$(this).parent().siblings('.lastName').append("<input type='text'>");
 				$(this).parent().siblings('.lastName').children("input").val(currentLastName);
 				
-                                $(this).parent().siblings('.title').empty();
-				$(this).parent().siblings('.title').append("<input type='text'>");
-				$(this).parent().siblings('.title').children("input").val(currentTitle);
-                                
 				$(this).parent().siblings('.company').empty();
 				$(this).parent().siblings('.company').append("<input type='text'>");
 				$(this).parent().siblings('.company').children("input").val(currentCompany);
@@ -486,8 +478,7 @@ function prepareEditClientTable(){
 				
 				var currentFirstName = $(this).parent().siblings(".firstName").children("input").val();
 				var currentLastName = $(this).parent().siblings(".lastName").children("input").val();
-				var currentTitle = $(this).parent().siblings(".title").children("input").val();
-                                var currentCompany = $(this).parent().siblings(".company").children("input").val();
+				var currentCompany = $(this).parent().siblings(".company").children("input").val();
 				var currentAddress = $(this).parent().siblings(".address").children("input").val();
 				var currentCity = $(this).parent().siblings(".city").children("input").val();
 				
@@ -497,9 +488,6 @@ function prepareEditClientTable(){
 				
 				$(this).parent().siblings('.lastName').empty();
 				$(this).parent().siblings('.lastName').text(currentLastName);
-                                
-                                $(this).parent().siblings('.title').empty();
-				$(this).parent().siblings('.title').text(currentTitle);
 				
 				$(this).parent().siblings('.company').empty();
 				$(this).parent().siblings('.company').text(currentCompany);
@@ -543,7 +531,6 @@ function submitClientUpdate(){
 		currentArray['clientID'] = $("#clientRow" + count).children(".clientID").text();
 		currentArray['firstName'] = $("#clientRow" + count).children(".firstName").text();
 		currentArray['lastName'] = $("#clientRow" + count).children(".lastName").text();
-                currentArray['title'] = $("#clientRow" + count).children(".title").text();
 		currentArray['company'] = $("#clientRow" + count).children(".company").text();
 		currentArray['address'] = $("#clientRow" + count).children(".address").text();
 		currentArray['city'] = $("#clientRow" + count).children(".city").text();
