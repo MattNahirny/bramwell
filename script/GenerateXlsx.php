@@ -831,7 +831,7 @@ class GenerateXlsx
         $reserveSurplusDeficiencyRow = $cursor;
         $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Adequacy');
-        $reserveAdequacy = $cursor;
+        $reserveAdequacyRow = $cursor;
         $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Monthly ASL Contributions');
         $monthlyASLContributionsRow = $cursor;
@@ -952,21 +952,76 @@ class GenerateXlsx
             $lastCol = $letter;
         }
 
-        //$this->SchedC1THSheet->SetCellValue( , );
-        //$this->SchedC1THSheet->SetCellValue( , );
-        //$this->SchedC1THSheet->SetCellValue( , );
-        //$this->SchedC1THSheet->SetCellValue( , );
-        //$this->SchedC1THSheet->SetCellValue( , );
-        //$this->SchedC1THSheet->SetCellValue( , );
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $reserveSurplusDeficiencyRow, '=+' . $letter . $RFClosingBalanceRow . '-' . $letter . $RFRequirementseRow);
+        }
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $reserveAdequacyRow, '=' . $letter . $RFClosingBalanceRow . '/' . $letter . $RFRequirementseRow);
+        }
+        $this->SchedC1THSheet->SetCellValue( $letter . $monthlyASLContributionsRow, '=' . $letter . '15/\'Basic Info\'!$C$3/12');
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $annualASLContributionsRow, '=' . $letter . '15/\'Basic Info\'!$C$3');
+        }
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $annualPossibleSpecialLeviesRow, '=' . $letter . '16/\'Basic Info\'!$C$3');
+        }
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $totalASLContributionsSpecialLeviesRow, '=(' . $letter . '15+' . $letter . '16)/\'Basic Info\'!$C$3');
+        }
+
+        //STYLED LARGE TABLE YEARS 1-15
+        $largeTable1To15Start = $totalASLContributionsSpecialLeviesRow + 2;
+        $cursor = $totalASLContributionsSpecialLeviesRow + 2;
+        //TOP ROW WITH TITLES
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
+        $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
+        $this->SchedC1THSheet->SetCellValue('D' . $cursor, '  Schedule C.1 – THRESHOLD MODEL – 30 Year RESERVE FUND CASH FLOW PROJECTION AND DEFICIENCY ANALYSIS');
+        $this->SchedC1THSheet->SetCellValue('R' . $cursor, 'Years 1 - 15');
+        $cursor++;
+
+
+        //title of next section
+        $largeTableArray1 = array(
+        'Construction Inflation Rate:',
+        'Investments Interest Rate:',
+        'Fiscal Year End:',
+        'RESERVE FUND OPENING BALANCE',
+        'Annual Reserve Fund Contributions',
+        'Possible Special Levies',
+        'Possible Borrowings',
+        'Annual Reserve Fund Interest Income',
+        'Total Cash Resources',
+        'RESERVE FUND EXPENDITURES');
+        //$this->dummp($largeTableArray1);
+        for ($i = $cursor, $j = 0; $j < 10; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . $i , $largeTableArray1[$j]);
+        }
+
+        //$this->SchedC1THSheet->SetCellValue(,);
+
+        //$this->SchedC1THSheet->SetCellValue(,);
+
+
+
+        //STYLED LARGE TABLE YEARS 16-30
 
 
 
 
 
+        //STYLED SMALL TABLE YEARS 1-15
 
 
 
 
+
+        //STYLED SMALL TABLE YEARS 16-30
 
 
     }
