@@ -1,13 +1,10 @@
 <?php 
-
-
 //input controller
 //$servername = "198.71.227.98:3306";
 //$dbname = "bramwell";
 //$username = "bramwell";
 //$password = "Pdt9h8!3";
 include_once("db.php");
-
 	try {
 		$conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, array(
 		PDO::ATTR_PERSISTENT => false
@@ -20,7 +17,6 @@ include_once("db.php");
 	}
 	$loggedIn = checkLogIn();
 //--- Input controller ---//
-
 //Basic formula is to use a switch on the request, then within that do:
 //	A check of who is logged in, and what their access level is
 //	A check of if all neccessary variables are set
@@ -28,7 +24,6 @@ include_once("db.php");
 //	Any extra logic (such as setting certain variables like ReportID from session variables
 //	Then calling the appropriate function
 //	Then finally returning the result of the function
-
 	if(ISSET($_GET['request']) && $loggedIn){
 		$request = $_GET['request'];
 		
@@ -199,7 +194,6 @@ include_once("db.php");
 				
 			case "submitLogInRequest":
 				if(ISSET($_POST["username"], $_POST["password"])){
-
 					$username = $_POST["username"];
 					$password = $_POST["password"];
 					
@@ -245,7 +239,6 @@ include_once("db.php");
 				
 			case "submitModule":
 				$gate = checkAccessLevel();
-
 				
 				if($gate >= 2 && ISSET($_POST['levelFourID'], $_POST['dateAcquired'], $_POST['units'], $_POST['unitOfMeasure'], $_POST['effectiveAge'], $_POST['physCondition'], $_POST['condAnalysis'], $_POST['defAnalysis'], $_POST['finAnalysis'])){
 				
@@ -340,7 +333,6 @@ include_once("db.php");
 			
 			// this is a painful amount of variables
 			case "submitDetails":
-
 				$gate = checkAccessLevel();
 				if($gate >= 2 && ISSET($_POST['strataNumber'], $_POST['strataName'], $_POST['clientID'], $_POST['inspectorArray'], $_POST['inspectionDateArray'], $_POST['effectiveDate'], $_POST['materialGiven'], $_POST['street'], $_POST['city'], $_POST['postalCode'], $_POST['location'], $_POST['constructType'], $_POST['strataRegDate'], $_POST['constructYear'], $_POST['numberOfLvl'], $_POST['strataPlans'], $_POST['plansScheduleDetails'], $_POST['sitePlans'], $_POST['restrictedCovenant'], $_POST['residentialLots'], $_POST['commercialLots'], $_POST['complexOwnedLots'], $_POST['numberBuildings'], $_POST['siteArea'], $_POST['siteCoverage'], $_POST['buildingHeight'], $_POST['constOverview'], $_POST['constFoundations'], $_POST['constSubstructure'], $_POST['constExterior'], $_POST['constRoofDrainage'], $_POST['constAmenities'], $_POST['constElectrical'], $_POST['constServices'])){
 						
@@ -371,7 +363,6 @@ include_once("db.php");
 					$commercialLots =  $_POST['commercialLots'];
 					$complexOwnedLots =  $_POST['complexOwnedLots'];
 					$numberBuildings =  $_POST['numberBuildings'];
-
 					$siteArea =  $_POST['siteArea'];
 					$siteCoverage =  $_POST['siteCoverage'];
 					
@@ -453,7 +444,6 @@ include_once("db.php");
 					echo json_encode($return, JSON_FORCE_OBJECT);
 				}
 				break;
-
 			case "submitInspectorUpdate":
 				$gate = checkAccessLevel();
 				if($gate >= 4 && ISSET($_POST['dataArray'])){
@@ -469,16 +459,17 @@ include_once("db.php");
 				break;
 			case "submitClient":
 				$gate = checkAccessLevel();
-				if($gate >= 4 && ISSET($_POST['firstName'], $_POST['lastName'], $_POST['company'], $_POST['address'], $_POST['city'])){
+				if($gate >= 4 && ISSET($_POST['firstName'], $_POST['lastName'], $_POST['title'], $_POST['company'], $_POST['address'], $_POST['city'])){
 				
 					$firstName = $_POST['firstName'];
 					$lastName = $_POST['lastName'];
+                                        $title = $_POST['title'];
 					$company = $_POST['company'];
 					$address = $_POST['address'];
 					$city = $_POST['city'];
 					
 					
-					$return = submitClient($conn, $firstName, $lastName, $company, $address, $city);
+					$return = submitClient($conn, $firstName, $lastName, $title, $company, $address, $city);
 					echo json_encode($return, JSON_FORCE_OBJECT);
 				}
 				else if($gate < 4){
@@ -502,7 +493,6 @@ include_once("db.php");
 			case "submitUser":
 				$gate = checkAccessLevel();
 				if($gate >= 5 && ISSET($_POST["username"], $_POST["password"], $_POST["email"], $_POST['accessLevel'])){
-
 					$username = $_POST["username"];
 					$password = $_POST["password"];
 					$email = $_POST["email"];
@@ -596,7 +586,6 @@ include_once("db.php");
 				
 			case "submitLogInRequest":
 				if(ISSET($_POST["username"], $_POST["password"])){
-
 					$username = $_POST["username"];
 					$password = $_POST["password"];
 					
@@ -616,11 +605,9 @@ include_once("db.php");
 function addModule($conn, $physicalDescStandardDesc, $physicalDescStandardComments, $finAnalysisDefaultComment, $finAnalysisStandardComments, $potentDeteriorationDefaultComment, $condAnalysisDefaultComment, $condAnalysisStandardComments, $defAnalysisDefaultComment, $defAnalysisStandardComments, $lvlOne, $lvlTwo, $lvlThree, $name, $unitOfMeasure, $costPerUnit, $lifespan){
 	
 	//Need to verify data, such as that the dropdowns (levelOne, levelTwo, etc) are not 'default' and correspond to actual levels
-
 	
 	//Logic to get if a level for that level name exists, if not it creates an ID for it (in order to maintain foreign keys, done by hand rather than Auto Increment
 	//These are all using the insecure countRows function, consider replacing with a dedicated getter
-
 	
 	$existingLevelOne = getLevelID($conn, 'levelone', $lvlOne);
 	$existingLevelTwo = getLevelID($conn, 'leveltwo', $lvlTwo);
@@ -662,7 +649,6 @@ function addModule($conn, $physicalDescStandardDesc, $physicalDescStandardCommen
 			insertStandardComment($conn, $levelFourID, "physicalDesc", $standardComment); 
 		}
 	}
-
 	
 	foreach($finAnalysisStandardComments as $standardComment){
 		if($standardComment != "none"){
@@ -670,14 +656,12 @@ function addModule($conn, $physicalDescStandardDesc, $physicalDescStandardCommen
 		}
 	}
 	
-
 	foreach($condAnalysisStandardComments as $standardComment){
 		if($standardComment != "none"){
 			insertStandardComment($conn, $levelFourID, "condAnalysis", $standardComment); 
 		}
 	}
 	
-
 	foreach($defAnalysisStandardComments as $standardComment){
 		if($standardComment != "none"){
 			insertStandardComment($conn, $levelFourID, "defAnalysis", $standardComment);
@@ -688,12 +672,10 @@ function addModule($conn, $physicalDescStandardDesc, $physicalDescStandardCommen
 	$return = ["message" => "Successfully inserted module"];
 	return $return;
 }
-
 //Function for submitting the actual module/component, when an inspector is doing a report
 //Have to specify one of the following for type:
 // [ physicalDesc, finAnalysis, condAnalysis, defAnalysis ]
 function submitModule($conn, $planID, $levelFourID, $dateAcquired, $units, $unitOfMeasure, $effectiveAge, $physCondition, $condAnalysis, $defAnalysis, $finAnalysis){
-
 	//uses insecure function countRows, consider replacing with dedicated count function
 	
 	$moduleExists = getCountModule($conn, $planID, $levelFourID);
@@ -728,7 +710,6 @@ function submitModule($conn, $planID, $levelFourID, $dateAcquired, $units, $unit
 }
 //Submitting images,
 //This was mostly scalped from W3 schools, but I modified it to suit our needs
-
 //Stores all images to the /wwwroot/script/uploads/report[REPORTID]
 //Stores the URI, the caption, and which plan/levelFourID it belongs to
 function submitImage($conn, $planID, $levelFourID, $image, $caption){
@@ -741,7 +722,6 @@ function submitImage($conn, $planID, $levelFourID, $image, $caption){
 	$target_file = $target_dir . basename($image["name"]);
 	$uploadOk = 1;
 	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-
 	// Check if image file is a actual image or fake image
 	if(isset($_POST["submit"])) {
 		$check = getimagesize($image["tmp_name"]);
@@ -760,7 +740,6 @@ function submitImage($conn, $planID, $levelFourID, $image, $caption){
 		return $return;
 		$uploadOk = 0;
 	}
-
 	// Allow only jpg, png, gif and jpeg
 	if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
 	&& $imageFileType != "gif" ) {
@@ -768,24 +747,20 @@ function submitImage($conn, $planID, $levelFourID, $image, $caption){
 		return $return;
 		$uploadOk = 0;
 	}
-
 	// Check if $uploadOk is set to 0 by an error
 	if ($uploadOk == 0) {
 		$return = ['message' => "Sorry, there was an error in the upload process."];
 		return $return;
-
 	// if everything is ok, try to upload file
 	} else {
 		if (move_uploaded_file($image["tmp_name"], $target_file)) {
 			$return = ['message' => "The file ". basename( $image["name"]). " has been uploaded."];
 			$sql = "INSERT INTO componentpicture (PlanId, LevelFourId, PictureURI, Caption) VALUES (:planID, :levelFourID, :pictureURI, :caption)";	
 			$sth = $conn->prepare($sql);
-
 			$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 			$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
 			$sth->bindParam(':pictureURI', $target_file, PDO::PARAM_STR, 45);
 			$sth->bindParam(':caption', $caption, PDO::PARAM_STR, 255);
-
 			$sth->execute();
 			$sth->closeCursor();
 			return $return;
@@ -794,12 +769,9 @@ function submitImage($conn, $planID, $levelFourID, $image, $caption){
 		}
 	}
 }
-
-
 //SL
 //Function to Submit images for the author
 function submitAuthorImage($conn, $authorID, $image) {
-
     $target_dir = "uploads/report/authors";
     if(!(is_dir($target_dir))){
 	mkdir($target_dir);
@@ -808,7 +780,6 @@ function submitAuthorImage($conn, $authorID, $image) {
     $target_file = $target_dir . basename($image["name"]);
     $uploadOk = 1;
     $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-
 // Check if image file is a actual image or fake image
     if(isset($_POST["submit"])) {
         $check = getimagesize($image["tmp_name"]);
@@ -824,14 +795,12 @@ function submitAuthorImage($conn, $authorID, $image) {
     if (file_exists($target_file)) {
         unlink($target_file);
     }
-
 // Allow only jpg, png, gif and jpeg
     if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
         && $imageFileType != "gif" ) {
 	$return = ['message' => "Sorry, only JPG, JPEG, PNG & GIF files can be uploaded."];
 	return $return;
     }
-
 	// if everything is ok, try to upload file
     if (move_uploaded_file($image["tmp_name"], $target_file)) {
         $return = ['message' => "The file ". basename( $image["name"]). " has been uploaded."];
@@ -847,13 +816,10 @@ function submitAuthorImage($conn, $authorID, $image) {
         }
 }
 //SL E
-
-
 //Basic getter for a component (completed by an inspector) based on a levelFourID
 function getModule($conn, $planID, $levelFourID){
 	$sql = "SELECT * FROM plancomponent WHERE PlanId = :planID AND LevelFourId = :levelFourID";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
@@ -867,7 +833,6 @@ function getModule($conn, $planID, $levelFourID){
 function getCountModule($conn, $planID, $levelFourID){
 	$sql = "SELECT count(*) FROM plancomponent WHERE PlanId = :planID AND LevelFourId = :levelFourID";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
@@ -886,7 +851,6 @@ function getCountModule($conn, $planID, $levelFourID){
 function insertUnqComment($conn, $planComponentID, $comment, $type){
 	$sql = "INSERT INTO unqcomment (PlanComponentId, Comment, Type) VALUES (:planComponentID, :comment, :type)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planComponentID', $planComponentID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':comment', $comment, PDO::PARAM_STR);
@@ -895,14 +859,12 @@ function insertUnqComment($conn, $planComponentID, $comment, $type){
 	$sth->execute();
 	$return = ['message' => 'Successfully added the order'];
 	$sth->closeCursor();
-
 	return $return;
 }
 //Insert statement for the levelone table, for creating the whole level1 -> level2 -> level3 -> level4 structure
 function insertLevelOne($conn, $lvlOne){
 	$sql = "INSERT INTO levelone (Name) VALUES (:lvlOne)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':lvlOne', $lvlOne, PDO::PARAM_STR, 45);
 	
@@ -912,12 +874,10 @@ function insertLevelOne($conn, $lvlOne){
 	
 	return $return;
 }
-
 //Insert statement for the leveltwo table, for creating the whole level1 -> level2 -> level3 -> level4 structure
 function insertLevelTwo($conn, $lvlTwo, $levelOneID){
 	$sql = "INSERT INTO leveltwo (Name, LevelOneId) VALUES (:lvlTwo, :levelOneID)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':lvlTwo', $lvlTwo, PDO::PARAM_STR, 45);
 	$sth->bindParam(':levelOneID', $levelOneID, PDO::PARAM_INT, 11);
@@ -928,12 +888,10 @@ function insertLevelTwo($conn, $lvlTwo, $levelOneID){
 	
 	return $return;
 }
-
 //Insert statement for the levelthree table, for creating the whole level1 -> level2 -> level3 -> level4 structure
 function insertLevelThree($conn, $lvlThree, $levelTwoID){
 	$sql = "INSERT INTO levelthree (Name, LevelTwoId) VALUES (:lvlThree, :levelTwoID)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':lvlThree', $lvlThree, PDO::PARAM_STR, 45);
 	$sth->bindParam(':levelTwoID', $levelTwoID, PDO::PARAM_INT, 11);
@@ -944,12 +902,10 @@ function insertLevelThree($conn, $lvlThree, $levelTwoID){
 	
 	return $return;
 }
-
 //Insert statement for the levelfour table, for creating the whole level1 -> level2 -> level3 -> level4 structure
 function insertLevelFour($conn, $name, $levelThreeID, $physicalDescStandardDesc, $finAnalysisDefaultComment, $condAnalysisDefaultComment, $defAnalysisDefaultComment, $costPerUnit, $lifespan, $potentDeteriorationDefaultComment, $unitOfMeasure){
 	$sql = "INSERT INTO levelfour (Name, LevelThreeId, DefPhysicalCondition, DefFinancialAnalysis, DefConditionAnalysis, Cost, DefDeficiencyAnalysis, ExpectedLifespan, DefPotentialDeterioration, UnitOfMeasure) VALUES (:name, :levelThreeID, :physicalDescStandardDesc, :finAnalysisDefaultComment, :condAnalysisDefaultComment, :costPerUnit, :defAnalysisDefaultComment, :lifespan, :potentDeteriorationDefaultComment, :unitOfMeasure)";
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':name', $name, PDO::PARAM_STR, 45);
 	$sth->bindParam(':levelThreeID', $levelThreeID, PDO::PARAM_INT, 11);
@@ -968,17 +924,12 @@ function insertLevelFour($conn, $name, $levelThreeID, $physicalDescStandardDesc,
 	
 	return $return;
 }
-
-
 //Inserts a row into the standard comments table,
 //Have to specify one of the following for type:
 // [ physicalDesc, finAnalysis, condAnalysis, defAnalysis ]
-
 function insertStandardComment($conn, $levelFourID, $type, $comment){
-
 	$sql = "INSERT INTO stndcomment (Comment, LevelFourId, Type) VALUES (:comment, :levelFourID, :type)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':comment', $comment, PDO::PARAM_STR);
 	$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
@@ -988,9 +939,7 @@ function insertStandardComment($conn, $levelFourID, $type, $comment){
 	$sth->closeCursor();
 	$return = ['message' => 'Successfully added the order'];
 	return $return;
-
 }
-
 //Function for pausing the report
 //Inserts the reportID, and then saves ALL modules, completed or not, to the incompletemodule table
 function pauseReport($conn, $planID, $moduleArray){
@@ -1006,13 +955,10 @@ function pauseReport($conn, $planID, $moduleArray){
 	return $return;
 	
 }
-
 //Insert statement for storing a temporary report module/component
 function insertIncompleteModule($conn, $planID, $levelFourID){
-
 	$sql = "INSERT INTO incompletecomponents (PlanId, LevelFourId) VALUES (:planID, :levelFourID)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
@@ -1022,12 +968,10 @@ function insertIncompleteModule($conn, $planID, $levelFourID){
 	$return = ['message' => 'Successfully added the order'];
 	return $return;
 }
-
 //Insert statement for storing a temporary report
 function insertTemporaryReport($conn, $planID){
 	$sql = "INSERT INTO temporaryreport (PlanId, DatePaused) VALUES (:planID, CURDATE())";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 	
@@ -1039,11 +983,9 @@ function insertTemporaryReport($conn, $planID){
 	$return = ['message' => 'Successfully added the order'];
 	return $return;
 }
-
 //Function for de-setting the session planID
 //Very important to be calling this anytime someone finishes working on a new/continue report
 //Can break the system a bit otherwise, sessions are wack.
-
 function closeReport(){
 	session_start();
 		unset($_SESSION['planID']);
@@ -1051,15 +993,12 @@ function closeReport(){
 	
 	$return = ["msg" => "successfully closed the report"];
 	return $return;
-
 }
-
 //Delete all the modules associated with a plan, then the plan itself
 //Designed to be used with deleting a current going report if the user refreshes the page
 //Or navigates away without using the official save button
 //Current needs root level access, not in use.
 function deletePlan($conn){
-
 	session_start();
 		$planID = $_SESSION['planID'];
 	session_write_close();
@@ -1080,12 +1019,9 @@ function deletePlan($conn){
 	
 	$return = ['message' => 'Successfully deleted the report'];
 	return $return;
-
 }
-
 //Delete statement for the modules in a report, see above
 function deletePlanModules($conn, $planID){
-
 	
 	$sql = "DELETE FROM plancomponent WHERE PlanId = :planID";
 	$sth = $conn->prepare($sql);
@@ -1094,10 +1030,7 @@ function deletePlanModules($conn, $planID){
 	
 	$sth->execute();
 	$sth->closeCursor();
-
 }
-
-
 //Deleting a continue report, was in use but stopped during testing. Not enabled
 function deleteContinueReport($conn, $planID){
 	$sql = "DELETE FROM temporaryreport WHERE PlanId = :planID";
@@ -1108,7 +1041,6 @@ function deleteContinueReport($conn, $planID){
 	$sth->execute();
 	$sth->closeCursor();
 }
-
 //Deleting a continue report module list, was in use but stopped during testing. Not enabled
 function deleteUnfinishedModules($conn, $planID){
 	$sql = "DELETE FROM incompletecomponents WHERE PlanId = :planID";
@@ -1119,10 +1051,8 @@ function deleteUnfinishedModules($conn, $planID){
 	$sth->execute();
 	$sth->closeCursor();
 }
-
 //Function for inserting the biggest details of a report itself, such as the postal code, the client, etc.
 function submitDetails($conn, $strataNumber, $strataName, $clientID, $inspectorArray, $inspectionDateArray, $effectiveDate, $materialGiven, $street, $city, $postalCode, $location, $constructType, $strataRegDate, $constructYear, $numberOfLvl, $strataPlans, $plansScheduleDetails, $sitePlans, $restrictedCovenant, $residentialLots, $commercialLots, $complexOwnedLots, $numberBuildings, $siteArea, $siteCoverage, $buildingHeight, $constOverview, $constFoundations, $constSubstructure, $constExterior, $constRoofDrainage, $constAmenities, $constElectrical, $constServices, $serviceArray){
-
 	
 	//insecure function, consider replacing with a dedicated sql query
 	$planCount = countRows($conn, "plan");
@@ -1145,7 +1075,6 @@ function submitDetails($conn, $strataNumber, $strataName, $clientID, $inspectorA
 	session_write_close();
 	//Final bullshit check
 	
-
 	//if no existing report (uses auto increment), or if the session was not set
 	if($reportCount == 0 || $sessionSet == false){
 		
@@ -1166,7 +1095,6 @@ function submitDetails($conn, $strataNumber, $strataName, $clientID, $inspectorA
 	//Assigns reports to the userID of whoever is logged in.
 	$userID = getLoggedInID();
 	
-
 	$sth = $conn->prepare($sql);
 	
 	//need to attach it if updating, else it uses auto increment
@@ -1186,12 +1114,9 @@ function submitDetails($conn, $strataNumber, $strataName, $clientID, $inspectorA
 	$sth->bindParam(':strataRegDate', $strataRegDate);
 	$sth->bindParam(':constructYear', $constructYear);
 	$sth->bindParam(':numberOfLvl', $numberOfLvl, PDO::PARAM_STR, 45);
-
-
 	$sth->bindParam(':siteArea', $siteArea, PDO::PARAM_INT, 11);
 	$sth->bindParam(':siteCoverage', $siteCoverage, PDO::PARAM_INT, 11);
 	$sth->bindParam(':buildingHeight', $buildingHeight, PDO::PARAM_INT, 11);
-
 	$sth->bindParam(':strataPlans', $strataPlans, PDO::PARAM_STR);
 	$sth->bindParam(':plansScheduleDetails', $plansScheduleDetails, PDO::PARAM_STR);
 	$sth->bindParam(':sitePlans', $sitePlans, PDO::PARAM_STR);
@@ -1230,7 +1155,6 @@ function submitDetails($conn, $strataNumber, $strataName, $clientID, $inspectorA
 	submitInspectionDates($conn, $planID, $inspectionDateArray);
 	submitServices($conn, $planID, $serviceArray);
 	return $return;
-
 }
 //Insert function for inserting into the inspectedby table
 function submitInspectedBy($conn, $planID, $inspectorArray){
@@ -1238,7 +1162,6 @@ function submitInspectedBy($conn, $planID, $inspectorArray){
 	deleteInspectedBy($conn, $planID);
 	foreach($inspectorArray as $inspectorID){
 		$sth = $conn->prepare($sql);
-
 		$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 		$sth->bindParam(':inspectorID', $inspectorID, PDO::PARAM_INT, 11);				
 		$sth->execute();
@@ -1247,7 +1170,6 @@ function submitInspectedBy($conn, $planID, $inspectorArray){
 	}
 	$return = ['message' => 'Successfully added the inspector'];
 	return $return;
-
 }
 //Delete function for inspectedby
 function deleteInspectedBy($conn, $planID){
@@ -1266,7 +1188,6 @@ function submitServices($conn, $planID, $serviceArray){
 	
 	foreach($serviceArray as $service){
 		$sth = $conn->prepare($sql);
-
 		$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 		$sth->bindParam(':serviceName', $service['serviceName'], PDO::PARAM_STR);				
 		$sth->bindParam(':comment', $service['serviceValue'], PDO::PARAM_STR);				
@@ -1278,7 +1199,6 @@ function submitServices($conn, $planID, $serviceArray){
 	$return = ['message' => 'Successfully added the service'];
 	return $return;
 }
-
 //delete function for planservice table
 function deleteServices($conn, $planID){
 	$sql = "DELETE FROM planservice WHERE PlanId = :planID";
@@ -1301,11 +1221,9 @@ function submitInspectionDates($conn, $planID, $inspectionDateArray){
 		
 		$sth->closeCursor();
 	}
-
 	$return = ['message' => 'Successfully added the date'];
 	return $return;
 }
-
 //delete function for dateinspected table
 function deleteDateInspected($conn, $planID){
 	$sql = "DELETE FROM dateinspected WHERE PlanId = :planID";
@@ -1316,13 +1234,11 @@ function deleteDateInspected($conn, $planID){
 	$sth->execute();
 	$sth->closeCursor();
 }
-
 //a count function for the plan table, based on strata name and planID,
 //Used to check if a report actually exists/verify planID when inserting/updating details
 function checkReportExists($conn, $planID, $strataName){
 	$sql = "SELECT count(*) FROM plan WHERE PlanId = :planID AND StrataNumber = :strataName";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':strataName', $strataName, PDO::PARAM_STR, 45);
@@ -1339,10 +1255,8 @@ function checkReportExists($conn, $planID, $strataName){
 //building type should be one of: [flatland, complex, townhouse, custom]
 //infotype should be one of: [overview, electrical, amenities, roof, services, exterior, substructure, foundations]
 function submitConstructInfo($conn, $infoType, $buildingType, $comment){
-
 	$sql = "INSERT INTO constructioninfo (InfoType, BuildingType, Comment) VALUES (:infoType, :buildingType, :comment)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':infoType', $infoType, PDO::PARAM_STR, 25);
 	$sth->bindParam(':buildingType', $buildingType, PDO::PARAM_STR, 25);
@@ -1367,7 +1281,6 @@ function deleteConstructionInfo($conn, $constructInfoID){
 //Inefficient on database side, but easier.
 function submitCostingChanges($conn, $dataArray){
 	//do checking of values, make sure okay to submit
-
 	
 	$sql = "UPDATE levelfour SET UnitOfMeasure = :unitOfMeasure, Cost = :cost, ExpectedLifespan = :lifespan WHERE LevelFourId = :levelFourID";	
 	$sth = $conn->prepare($sql);
@@ -1383,17 +1296,15 @@ function submitCostingChanges($conn, $dataArray){
 	$sth->closeCursor();
 	$return = ['message' => 'Successfully changed the costing table'];
 	return $return;
-
 }
 //Submits a new client into system
-function submitClient($conn, $firstName, $lastName, $company, $address, $city){
-
-	$sql = "INSERT INTO client (PMFirstName, PMLastName, CompanyName, City, Address) VALUES (:firstName, :lastName, :company, :city, :address)";	
+function submitClient($conn, $firstName, $lastName,$title, $company, $address, $city){
+	$sql = "INSERT INTO client (PMFirstName, PMLastName, Title, CompanyName, City, Address) VALUES (:firstName, :lastName,:title, :company, :city, :address)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':firstName', $firstName, PDO::PARAM_STR, 45);
 	$sth->bindParam(':lastName', $lastName, PDO::PARAM_STR, 45);
+        $sth->bindParam(':title', $title, PDO::PARAM_STR, 45);
 	$sth->bindParam(':company', $company, PDO::PARAM_STR, 45);
 	$sth->bindParam(':city', $city, PDO::PARAM_STR, 45);
 	$sth->bindParam(':address', $address, PDO::PARAM_STR, 45);
@@ -1409,7 +1320,7 @@ function submitClient($conn, $firstName, $lastName, $company, $address, $city){
 //submits the entire costing report and updates all values, including unchanged ones. 
 //Inefficient on database side, but easier.
 function submitClientUpdate($conn, $dataArray){
-	$sql = "UPDATE client SET PMFirstName = :firstName, PMLastName = :lastName, CompanyName = :company, Address = :address, City = :city WHERE ClientId = :clientID";	
+	$sql = "UPDATE client SET PMFirstName = :firstName, PMLastName = :lastName, Title = :title, CompanyName = :company, Address = :address, City = :city WHERE ClientId = :clientID";	
 	
 	$sth = $conn->prepare($sql);
 	foreach($dataArray as $dataItem){
@@ -1417,6 +1328,7 @@ function submitClientUpdate($conn, $dataArray){
 		$sth->bindParam(':clientID', $dataItem['clientID'], PDO::PARAM_INT, 11);
 		$sth->bindParam(':firstName', $dataItem['firstName'], PDO::PARAM_STR, 45);
 		$sth->bindParam(':lastName', $dataItem['lastName'], PDO::PARAM_STR, 45);
+                $sth->bindParam(':title', $dataItem['title'], PDO::PARAM_STR, 45);
 		$sth->bindParam(':company', $dataItem['company'], PDO::PARAM_STR, 45);
 		$sth->bindParam(':city', $dataItem['city'], PDO::PARAM_STR, 45);
 		$sth->bindParam(':address', $dataItem['address'], PDO::PARAM_STR, 45);
@@ -1427,20 +1339,17 @@ function submitClientUpdate($conn, $dataArray){
 	$sth->closeCursor();
 	$return = ['message' => 'Successfully changed the costing table'];
 	return $return;
-
 }
 //submit new inspector
 function submitInspector($conn, $firstName, $lastName, $email, $phone, $cell){
 	$sql = "INSERT INTO inspector (FirstName, LastName, Email, Phone, Cell) VALUES (:firstName, :lastName, :email, :phone, :cell)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':firstName', $firstName, PDO::PARAM_STR, 45);
 	$sth->bindParam(':lastName', $lastName, PDO::PARAM_STR, 45);
 	$sth->bindParam(':email', $email, PDO::PARAM_STR, 45);
 	$sth->bindParam(':phone', $phone, PDO::PARAM_STR, 25);
 	$sth->bindParam(':cell', $cell, PDO::PARAM_STR, 25);
-
 	$sth->execute();
 	$sth->closeCursor();
 	
@@ -1450,7 +1359,6 @@ function submitInspector($conn, $firstName, $lastName, $email, $phone, $cell){
 //submits the entire costing report and updates all values, including unchanged ones. 
 //Inefficient on database side, but easier.
 function submitInspectorUpdate($conn, $dataArray){
-
 	$sql = "UPDATE inspector SET FirstName = :firstName, LastName = :lastName, Email = :email, Phone = :phone, Cell = :cell WHERE InspectorId = :inspectorID";	
 	
 	$sth = $conn->prepare($sql);
@@ -1478,7 +1386,6 @@ function submitUser($conn, $username, $password, $email, $accessLevel){
 	
 	$sql = "INSERT INTO user (Username, Password, Email, AccessLevel) VALUES (:username, :password, :email, :accessLevel)";	
 	$sth = $conn->prepare($sql);
-
 	
 	$sth->bindParam(':username', $username, PDO::PARAM_STR, 45);
 	$sth->bindParam(':password', $passwordHash, PDO::PARAM_STR, 128);
@@ -1514,7 +1421,6 @@ function submitUserUpdate($conn, $dataArray){
 //Only use internally (eg: this php page)! Vulnerable to sql injection. 
 //This should be replaced.
 function countRows($conn, $inputTable){
-
 	$table;
 	//whitelisting tables that are gettable
 	switch($inputTable){
@@ -1539,7 +1445,6 @@ function countRows($conn, $inputTable){
 	}
 	
 	$sql = "SELECT count(*) FROM $table";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1550,10 +1455,8 @@ function countRows($conn, $inputTable){
 	}
 	return $rows[0]["count(*)"];
 }
-
 //Submits a request to log in.
 function submitLogInRequest($conn, $username, $password){
-
 	$sql = "SELECT Password, UserId, AccessLevel, Password FROM user WHERE Username = :username";
 	
 	$sth = $conn->prepare($sql);
@@ -1580,10 +1483,8 @@ function submitLogInRequest($conn, $username, $password){
 	return $return;
 	
 }
-
 //function to get if someone is logged in
 function checkLogIn(){
-
 	session_start();
 		if(isset($_SESSION['loggedIn'])){
 			$return = $_SESSION['loggedIn'];
@@ -1594,21 +1495,16 @@ function checkLogIn(){
 	session_write_close();
 	
 	return $return;
-
 }
-
 //function to get the user who is logged in
 function getLoggedInID(){
-
 	session_start();
 		$return = $_SESSION['userID'];
 	session_write_close();
 	return $return;
 }
-
 //function to get the access level of whoever is logged in
 function checkAccessLevel(){
-
 	session_start();
 		if(isset($_SESSION['accessLevel'])){
 			$return = $_SESSION['accessLevel'];
@@ -1620,10 +1516,7 @@ function checkAccessLevel(){
 	
 	return $return;
 }
-
-
 function getLevelTables($conn, $level){
-
 	$table;
 	//whitelisting tables that are gettable
 	switch($level){
@@ -1639,7 +1532,6 @@ function getLevelTables($conn, $level){
 	}
 	
 	$sql = "SELECT * FROM $table";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1650,10 +1542,8 @@ function getLevelTables($conn, $level){
 	}
 	return $rows;
 }
-
 function getLevelThree($conn){
 	$sql = "SELECT * FROM levelthree";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1664,10 +1554,8 @@ function getLevelThree($conn){
 	}
 	return $rows;
 }
-
 function getLevelTwo($conn){
 	$sql = "SELECT * FROM leveltwo";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1678,10 +1566,8 @@ function getLevelTwo($conn){
 	}
 	return $rows;
 }
-
 function getLevelOne($conn){
 	$sql = "SELECT * FROM levelone";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1692,13 +1578,11 @@ function getLevelOne($conn){
 	}
 	return $rows;
 }
-
 //checks the level tables for rows with matching names, 
 // eg: checking for if a name already exists in the table
 // Should be replaced with dedicated requests
 // Insecure to SQL injection, switch is marginally better
 function getLevelID($conn, $level, $name){
-
 	$table;
 	//whitelisting tables that are gettable
 	switch($level){
@@ -1717,7 +1601,6 @@ function getLevelID($conn, $level, $name){
 	}
 	
 	$sql = "SELECT * FROM $table where Name = :name";
-
 	$sth = $conn->prepare($sql);
 	$sth->bindParam(':name', $name, PDO::PARAM_STR, 40);
 	$sth->execute();
@@ -1729,15 +1612,11 @@ function getLevelID($conn, $level, $name){
 	}
 	return $rows;
 }
-
 //Function get the reportID of reports you can continue to work on
 //currently only gets reports you own
 function getViewablePausedReports($conn){
 	$sql = "SELECT temporaryreport.PlanId, DatePaused FROM temporaryreport JOIN plan ON temporaryreport.PlanId = plan.PlanId WHERE plan.UserId = :userID";
-
-
 	$userID = getLoggedInID();
-
 	
 	$sth = $conn->prepare($sql);
 	$sth->bindParam(':userID', $userID, PDO::PARAM_INT, 11);
@@ -1750,12 +1629,9 @@ function getViewablePausedReports($conn){
 	}
 	return $rows;
 }
-
 //gets all user data (besides passwords and internalID)
 function getUsers($conn){
-
 	$sql = "SELECT Username, UserId, Email, AccessLevel FROM user";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1782,7 +1658,6 @@ function getClients($conn){
 	return $rows;
 	
 }
-
 //gets all inspector data
 function getInspectors($conn){
 	$sql = "SELECT * FROM inspector";
@@ -1798,13 +1673,11 @@ function getInspectors($conn){
 	return $rows;
 	
 }
-
 //gets a basic version of all modules (just the level names and IDs for all levels)
 function getModulesBasic($conn){
 	$sql = "SELECT levelfour.name AS 'levelFourName', levelfour.LevelFourId AS 'levelFourID', levelthree.name AS 'levelThreeName', levelthree.LevelThreeId AS 'levelThreeID',leveltwo.name AS 'levelTwoName', leveltwo.LevelTwoId AS 'levelTwoID', levelone.name AS 'levelOneName', levelone.LevelOneId AS 'levelOneID' FROM `levelfour` JOIN levelthree ON levelfour.LevelThreeId = levelthree.LevelThreeId
 	JOIN leveltwo ON levelthree.LevelTwoId = leveltwo.LevelTwoId
 	JOIN levelone ON leveltwo.LevelOneId = levelone.LevelOneId";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1815,13 +1688,11 @@ function getModulesBasic($conn){
 	}
 	return $rows;
 }
-
 //gets the costing table version of all the modules, more data that basic version (lifespan, cost, unit of measure, etc);
 function getModulesVerbose($conn){
 	$sql = "SELECT levelfour.name AS 'levelFourName', levelfour.LevelFourId AS 'levelFourID', levelfour.cost as 'cost', levelfour.ExpectedLifespan AS 'lifespan', levelfour.UnitOfMeasure AS 'unitOfMeasure', levelthree.name AS 'levelThreeName', levelthree.LevelThreeId AS 'levelThreeID',leveltwo.name AS 'levelTwoName', leveltwo.LevelTwoId AS 'levelTwoID', levelone.name AS 'levelOneName', levelone.LevelOneId AS 'levelOneID' FROM `levelfour` JOIN levelthree ON levelfour.LevelThreeId = levelthree.LevelThreeId
 	JOIN leveltwo ON levelthree.LevelTwoId = leveltwo.LevelTwoId
 	JOIN levelone ON leveltwo.LevelOneId = levelone.LevelOneId";
-
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	
@@ -1832,7 +1703,6 @@ function getModulesVerbose($conn){
 	}
 	return $rows;
 }
-
 //gets module data but limited to levelfourID's on a list
 function getModulesFromList($conn, $list){
 	$returnModules = array();
@@ -1859,11 +1729,9 @@ function getModulesFromList($conn, $list){
 	}
 	return $returnModules;
 }
-
 //gets the plan data for a single report, that is being continued
 function getCurrentContinueReport($conn, $planID){
 	$sql = "SELECT * FROM plan WHERE PlanId = :planID";
-
 	session_start();
 		$_SESSION['planID'] = $planID;
 	session_write_close();
@@ -1884,7 +1752,6 @@ function getCurrentContinueReport($conn, $planID){
 }
 //gets all the people who were attached to a report (inspectedby)
 function getInspectedBy($conn, $planID){
-
 	$sql = "SELECT * FROM inspectedby WHERE planId = :planID";
 	
 	$sth = $conn->prepare($sql);
@@ -1900,7 +1767,6 @@ function getInspectedBy($conn, $planID){
 }
 //gets the dates attached to a report
 function getDatesInspected($conn, $planID){
-
 	$sql = "SELECT * FROM dateinspected WHERE planId = :planID";
 	
 	$sth = $conn->prepare($sql);
@@ -1916,7 +1782,6 @@ function getDatesInspected($conn, $planID){
 }
 //gets the services attached a report
 function getPlanServices($conn, $planID){
-
 	$sql = "SELECT * FROM planservice WHERE planId = :planID";
 	
 	$sth = $conn->prepare($sql);
@@ -1945,12 +1810,9 @@ function getPlanComponents($conn, $planID){
 	}
 	return $rows;
 }
-
 //gets just the levelFourID for all components attached a plan
 function getFinishedModulesLevelFourId($conn){
-
 	$sql = "SELECT levelFourId FROM plancomponent WHERE planId = :planId";
-
 	session_start();
 		$planID = $_SESSION['continueReportID'];
 	session_write_close();
@@ -1968,7 +1830,6 @@ function getFinishedModulesLevelFourId($conn){
 }
 //gets all the components that were saved (completed or not) to incompletecomponents
 function getIncompleteComponents($conn, $planID){
-
 	$sql = "SELECT * FROM incompletecomponents WHERE planId = :planId";
 	
 	$sth = $conn->prepare($sql);
@@ -1986,9 +1847,7 @@ function getIncompleteComponents($conn, $planID){
 }
 //gets all standard comments for a levelFourID
 function getStandardComment($conn, $levelFourID, $type){
-
 	$sql = "SELECT StndCommentId, comment FROM stndcomment WHERE LevelFourId = :levelFourID AND type = :type";
-
 	$sth = $conn->prepare($sql);
 	$sth->bindParam(':levelFourID', $levelFourID, PDO::PARAM_INT, 11);
 	$sth->bindParam(':type', $type, PDO::PARAM_STR, 45);
@@ -2000,7 +1859,6 @@ function getStandardComment($conn, $levelFourID, $type){
 		$rows[] = $r;
 	}
 	return $rows;
-
 }
 //gets all construction infos (for dropdowns)
 function getConstructionInfo($conn, $buildingType){
@@ -2021,16 +1879,12 @@ function getConstructionInfo($conn, $buildingType){
 		$rows[] = $r;
 	}
 	return $rows;
-
 }
 //gets all the reports that a user can read (currently only those you created yourself)
 //area that should be extended upon in many ways
 function getViewableReports($conn){
 	$sql = "SELECT PlanId, plan.Name AS PlanName, CompanyName FROM plan JOIN client ON plan.ClientId = client.ClientId WHERE plan.UserId = :userID";
-
-
 	$userID = getLoggedInID();
-
 	
 	$sth = $conn->prepare($sql);
 	$sth->bindParam(':userID', $userID, PDO::PARAM_INT, 11);
@@ -2043,10 +1897,6 @@ function getViewableReports($conn){
 	}
 	return $rows;
 }
-
-
-
-
 //Function to return user data for Account management.
 function getUserData($conn){
         $userID = getLoggedInID();
