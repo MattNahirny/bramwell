@@ -663,6 +663,7 @@ class GenerateXlsx
             $this->TallySheet->calculateColumnWidths();
         }
         $totalsRow = $curRow;
+        $this->schedATotalsRow = $curRow;
         $this->SchedASheet->SetCellValue('A' . $curRow, 'TOTAL RESERVES');
         $this->SchedASheet->SetCellValue('J' . $curRow, '=SUM(J3:J' . ($curRow - 1) . ')');
         $this->SchedASheet->SetCellValue('K' . $curRow, '=SUM(K3:K' . ($curRow - 1) . ')');
@@ -812,7 +813,9 @@ class GenerateXlsx
             $this->SchedC1THSheet->SetCellValue('A' . (22 + $i), ($i + 1));
             $this->SchedC1THSheet->SetCellValue('B' . (22 + $i), $this->allComponents[$i]);
             $cursor = 22 + $i;
+
         }
+        $lastComponentRow = $cursor;
         $cursor += 2;
         //the totals
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Total Expenditures');
@@ -874,7 +877,7 @@ class GenerateXlsx
         $this->SchedC1THSheet->SetCellValue('AA15', '=IF((100%+\'Basic Info\'!$C$11)*' . $curletter . '15 <= \'Basic Info\'!$C$19,(100%+\'Basic Info\'!$C$11)*' . $curletter . '15,\'Basic Info\'!$C$19)');
         $this->SchedC1THSheet->SetCellValue('AA16', '');
         $this->SchedC1THSheet->SetCellValue('AA17', '0');
-        $this->SchedC1THSheet->SetCellValue('AA18', '=+AA14*\'Basic Info\'!$C$16');
+        $this->SchedC1THSheet->SetCellValue('AA18', '=+Z14*\'Basic Info\'!$C$16');
         $this->SchedC1THSheet->SetCellValue('AA19', '=+AA14+AA15+AA16+AA18');
         $curletter = 'A';
         //COLUMN AB-AI
@@ -890,12 +893,16 @@ class GenerateXlsx
             $curletter = $letter;
         }
         $cellRange3 = range('F', 'Z');
+        foreach(range('A', 'I') as $letter)
+        {
+            array_push($cellRange3, 'A' . $letter);
+        }
         //CALCULATE TOTALS FOR EACH COMPONENT
         for ($i = 0; $i < $this->numComponents; $i++)
         {
             $this->SchedC1THSheet->SetCellValue('C' . (22 + $i), '=\'Basic Info\'!$C$7+\'Sched. A\'!F'. ($i + 4));
             $this->SchedC1THSheet->SetCellValue('D' . (22 + $i), '=\'Sched. A\'!D'. ($i + 4));
-            $this->SchedC1THSheet->SetCellValue('E' . (22 + $i), 'SUM(F' . (22 + $i). ':AI' . (22 + $i) . ')');
+            $this->SchedC1THSheet->SetCellValue('E' . (22 + $i), '=SUM(F' . (22 + $i). ':AI' . (22 + $i) . ')');
             $replaceEvery = $this->SchedC1THSheet->getCell('D' . (22 + $i))->getCalculatedValue();
             $replaced = false;
             $yearsAfter = 0;
@@ -928,6 +935,39 @@ class GenerateXlsx
                 }
             }
         }
+        $this->SchedC1THSheet->SetCellValue('E' . ($totalExpendituresRow - 1), '=SUM(E22:E' . $lastComponentRow . ')');
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $totalExpendituresRow, '=SUM('. $letter . 22 . ':' . $letter . $lastComponentRow . ')');
+        }
+        $this->SchedC1THSheet->SetCellValue( $letter . $RFClosingBalanceRow, '=+' . $letter . '19-' . $letter . $lastComponentRow);
+        //L59 needs to be set up properly for variable amounts of components
+        $this->SchedC1THSheet->SetCellValue( 'F' . $RFRequirementseRow, '=\'Sched. A\'!L' . $this->schedATotalsRow . '-F' . $totalExpendituresRow);
+        $lastCol = 'F';
+        foreach($cellRange3 as $letter)
+        {
+            if ($letter == 'F')
+                continue;
+            $this->SchedC1THSheet->SetCellValue( $letter . $RFRequirementseRow, '=(+' . $lastCol . $RFRequirementseRow . '*(1+\'Basic Info\'!$C$16))+\'Sched. A\'!$O$' . $this->schedATotalsRow . '-' . $letter . $totalExpendituresRow);
+            $lastCol = $letter;
+        }
+
+        //$this->SchedC1THSheet->SetCellValue( , );
+        //$this->SchedC1THSheet->SetCellValue( , );
+        //$this->SchedC1THSheet->SetCellValue( , );
+        //$this->SchedC1THSheet->SetCellValue( , );
+        //$this->SchedC1THSheet->SetCellValue( , );
+        //$this->SchedC1THSheet->SetCellValue( , );
+
+
+
+
+
+
+
+
+
+
 
     }
 
