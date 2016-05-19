@@ -13,10 +13,10 @@ function logIn(){
 	var submitLogInRequest = $.ajax({url : 'script/server.php', method: 'POST', data : data, dataType:'json'});
 	
 	submitLogInRequest.success(function(data){
-		if(data['loggedIn'] == "false"){
+		if(data['loggedIn'] === "false"){
 			window.alert('Incorrect password/username');
 		}
-		else if(data['loggedIn'] == "true"){
+		else if(data['loggedIn'] === "true"){
 			console.log('Logged in');
 			window.location.href = "main.html";
 		}

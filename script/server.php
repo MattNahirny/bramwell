@@ -1911,8 +1911,11 @@ function getUserData($conn){
         
         return $row;
 }
+
 function getAccessLevels($conn){
+
 	$sql = "SELECT  title FROM userrole";
+
 	$sth = $conn->prepare($sql);
 	$sth->execute();
 	$rows = array();
@@ -1930,5 +1933,7 @@ function submitLogOutRequest(){
 			$_SESSION['accessLevel'] = NULL;
      session_destroy();
                     return true;
+
 }
+
 ?>
