@@ -19,3 +19,19 @@ function getViews(){
 		alert('Error with the connection: ' + textStatus + " " + errorThrown);
 	});
 }
+
+//Working on a logout function
+
+
+function logout() {
+	var data = {"request" : "submitLogOutRequest"};
+        var submitLogOutRequest = $.ajax({url : 'script/server.php', method: 'POST', data : data, dataType:'json'});
+        submitLogOutRequest.success(function(data){
+            alert("submitLogoutRequest Success");
+            window.location.replace("/index.html");
+        });
+        
+        submitLogOutRequest.error(function (jqXHR, textStatus, errorThrown){
+            alert('Error with the connection: ' + textStatus + " " + errorThrown);
+	});
+}
