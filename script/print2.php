@@ -8,14 +8,73 @@ $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, a
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 include_once("GenerateDoc.php");
+include_once("getData.php");
+include_once("excelToWord.php");
 
-$generator = new GenerateDoc($conn, 1);
+$planId = 30;
+$arrPlan = getPlan($conn, $planId);
+$arrComponent = getVerbosePlanComponents($conn, $planId);
+$arrInspectionDates = getInspectionDates($conn, $planId);
+
+
+//$aux = 
+
+// require_once '../script/PHPWord.php';
+//// New Word Document
+//$PHPWord = new PHPWord();
+//// New portrait section
+//$section = $PHPWord->createSection(array('borderColor'=>'00FF00', 'borderSize'=>12));
+//$section->addText('I am placed on a default section.');
+//// New landscape section
+//$section = $PHPWord->createSection(array('orientation'=>'landscape'));
+//$section->addText('I am placed on a landscape section. Every page starting from this section will be landscape style.');
+//$section->addPageBreak();
+//$section->addPageBreak();
+//// New portrait section
+//$section = $PHPWord->createSection(array('marginLeft'=>600, 'marginRight'=>600, 'marginTop'=>600, 'marginBottom'=>600));
+//$section->addText('This section uses other margins.');
+//// Save File
+//$objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
+//$objWriter->save('Section.docx');
+//
+//exit;
+$generator = new GenerateDoc($conn, $planId);
+
+$generator->setPlan($arrPlan);
+$generator->setComponents($arrComponent);
+$generator->setInspectionDates($arrInspectionDates);
+
+
+$generator->setAux($aux);
+
+//red text on the example report (ocean crest) to 'change' between some texts
+
 $generator->setUp();
-$generator->getComponent();
-$generator->getHeader();
-$generator->printNewReport();
-$generator->save();
+$generator->cover();
+$generator->letter();
+$generator->TOC();
+$generator->importantInformation();
+$generator->executiveSummary();
+$generator->depreciationReport();
+$generator->methodology();
+$generator->propertyInformation();
+$generator->reserveComponentAnalysis();
+$generator->reserveFundComponentEstimates();
+$generator->analysisOfReserveFundOperations();
+$generator->reserveFundManagement();
+$generator->recommendations();
+$generator->appendices();
+$generator->appendiceA();
+$generator->appendiceB();
+$generator->appendiceC();
+$generator->appendiceD();
 
+
+
+
+$generator->save();
+/////SEE NOTE TO LOOK AT PAGE 135 GREEN BINDER for item 4.7
+//
 
 
 
@@ -29,53 +88,6 @@ function printReport($conn, $planID){
 	$return = ['msg' => 'Successfully printed the report', 'uri' => $uri];
 	return $return;
 }
-
-
-
-
-//
-//function doit() {
-//require_once '../script/PHPWord.php';
-//// New Word Document
-//$PHPWord = new PHPWord();
-//// New portrait section
-//$section = $PHPWord->createSection();
-//// Define table style arrays
-//$styleTable = array('borderSize'=>6, 'borderColor'=>'006699', 'cellMargin'=>80);
-//$styleFirstRow = array('borderBottomSize'=>18, 'borderBottomColor'=>'0000FF', 'bgColor'=>'66BBFF');
-//// Define cell style arrays
-//$styleCell = array('valign'=>'center');
-//$styleCellBTLR = array('valign'=>'center', 'textDirection'=>PHPWord_Style_Cell::TEXT_DIR_BTLR);
-//// Define font style for first row
-//$fontStyle = array('bold'=>true, 'align'=>'center');
-//// Add table style
-//$PHPWord->addTableStyle('myOwnTableStyle', $styleTable, $styleFirstRow);
-//// Add table
-//$table = $section->addTable('myOwnTableStyle');
-//// Add row
-//$table->addRow(900);
-//// Add cells
-//$table->addCell(2000, $styleCell)->addText('Row 1', $fontStyle);
-//$table->addCell(2000, $styleCell)->addText('Row 2', $fontStyle);
-//$table->addCell(2000, $styleCell)->addText('Row 3', $fontStyle);
-//$table->addCell(2000, $styleCell)->addText('Row 4', $fontStyle);
-//$table->addCell(500, $styleCellBTLR)->addText('Row 5', $fontStyle);
-//// Add more rows / cells
-//for($i = 1; $i <= 10; $i++) {
-//	$table->addRow();
-//        $aaa = $i * $i;
-//	$table->addCell(2000)->addText("$aaa");
-//	$table->addCell(2000)->addText("Cell $i");
-//	$table->addCell(2000)->addText("Cell $i");
-//	$table->addCell(2000)->addText("Cell $i");
-//	
-//	$text = ($i % 2 == 0) ? 'X' : '';
-//	$table->addCell(500)->addText($text);
-//}
-//// Save File
-//$objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
-//$objWriter->save('../Docs/AdvancedTable.docx');
-//}
 
 
 function printNewReport($conn, $componentArray, $planArray, $planID) {
@@ -268,16 +280,6 @@ function printNewReport($conn, $componentArray, $planArray, $planID) {
 }
 
 
-//function getPlan($conn, $planID){
-//	$sql = "SELECT * FROM plan WHERE PlanId = :planID";
-//
-//	$sth = $conn->prepare($sql);
-//	$sth->bindParam(':planID', $planID, PDO::PARAM_INT, 11);
-//	$sth->execute();
-//	
-//	$row = $sth->fetch(PDO::FETCH_ASSOC);
-//	return $row;
-//}
 
 
 
