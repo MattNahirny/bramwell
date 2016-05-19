@@ -19,8 +19,8 @@ body {
 }
 
 /*------------------ START OF CREATE / ADD MODULE CSS -------------*/
-input, textarea{
-	color:#205bc7;
+input, textarea,{
+    color:#205bc7;
     padding: 2px;
     border: solid 1px #2168c9; 
     outline: 0; 
@@ -622,6 +622,94 @@ td.accessLevel, td.userID, td.clientID, td.inspectorID {
 /*-------------------- END OF VIEW CSS --------------------------------*/
 /*------------------- END OF MAIN & ADMIN CSS -------------------------*/
 
+/*------------------- START OF MANAGEACCOUNT CSS ----------------------*/
+
+#manageAcctContainer, #editPasswordContainer, #editUsernameContainer{
+    	border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+	width:600px;
+	margin: 30px auto;
+	padding: 30px 10px 30px 10px;
+}
+
+
+/*------------------- END OF MANAGEACCOUNT CSS ------------------------*/
+
+/*------------------- START OF AUTHOR CSS -----------------------------*/
+.authorContainer{
+        border-style:solid;
+	border-width:thin;
+	border-color: #2168c9;
+	width:600px;
+	margin: 10% auto;
+	padding: 30px 10px 30px 10px;
+        align-items: center;
+
+}
+
+.authorInputRow{
+    margin-left:10%;
+    display:inline-block;
+    width: 50%;
+    vertical-align: bottom;
+    margin-bottom: 5%;
+}
+
+.authorChoiceGroup{
+    margin-bottom:13px;
+}
+
+.authorBtn{
+    width: 150px;
+    padding: 10px 15px 10px 15px;
+    margin-top:5%;
+    margin-left:auto;
+    margin-right: auto;
+    
+    
+}
+
+.authorBtn:hover{
+	-webkit-transform: scale(1.02) translateY(-2px);
+	z-index: 1;
+}
+
+
+#inpuAuthorName{
+    
+}
+
+#inputAuthorTitle{
+    
+}
+
+#inputAuthorImage{
+    
+}
+
+#inputAuthorDescription{
+    width:300px;
+    height: 200px;
+}
+#addAuthorBtn{
+    
+}
+
+
+#editAuthorBtn{
+    
+}
+
+
+#authorExitBtn{
+    float:right;
+}
+
+#browseBtn{
+    
+}
+/*------------------- END OF AUTHOR CSS -------------------------------*/
 
 
 

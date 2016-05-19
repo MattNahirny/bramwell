@@ -30,20 +30,21 @@
                                                 $return .= "<a href='view.html'>View Report(s)</a>";
                                                 $return .= "<a href='author.html'>Create/Edit Authors</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html'>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
                                                 break;
                                         case 5:
                                                 $return .= "<a href= 'admin.html'>Administrative Tools</a>";
                                                 $return .= "<a href= 'view.html'>View Report(s)</a>";
-                                                $return .= "<a href='author.html>Create/Edit Authors</a>";
+                                                $return .= "<a href='author.html'>Create/Edit Authors</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html'>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
+                                                break;
 					case 4:
 						$return .= "<a href='admin.html'>Inspector Tools</a>";
                                                 $return .= "<a href='costing.html'>Adjust Costing</a>";
                                                 $return .= "<a href='addmodule.html'>Add Components</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html'>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
                                                 break;
 					case 3:
 						$return .= "<a href='costing.html'>Adjust Costing</a>";
@@ -51,18 +52,18 @@
                                                 $return .= "<a href='continue.html'>Continue Report</a>";
 						$return .= "<a href='create.html'>Create Report</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html'>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
                                                 break;
 					case 2:
 						$return .= "<a href='continue.html'>Continue Report</a>";
 						$return .= "<a href='create.html'>Create Report</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html'>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
                                                 break;
 					case 1:
 						$return .= "<a href='view.html'>View Report(s)</a>";
                                                 $return .= "<a href='manageaccount.html'>Account Management</a>";
-                                                $return .= "<a href='index.html' onclick>Logout</a>";
+                                                $return .= "<a onclick='logout()'>Logout</a>";
                                                 break;
 				}
 				echo $return;
@@ -110,9 +111,17 @@
 				}
 				echo $return;
 			break;
+                        case "author":
+                                $return["hasAccess"] = "false";
+				if($accessLevel >= 5){
+                                $return["hasAccess"] = "true";
+				}
+				
+				echo json_encode($return, JSON_FORCE_OBJECT);
+                            break;
 		}
 	}
-	
+	 
 function getLoggedIn(){
 	session_start();
 		if(isset($_SESSION['loggedIn'])){

@@ -578,6 +578,11 @@ include_once("db.php");
 					echo json_encode($return, JSON_FORCE_OBJECT);
 				}
 				break;
+                        case "submitLogoutRequest":
+                            $return = var_dump($_SESSION);
+                            echo json_encode($return, JSON_FORCE_OBJECT);
+                            submitLogOutRequest();
+                            break;
 			default:
 				$return = ["msg" => "Improper request"];
 				echo json_encode($return, JSON_FORCE_OBJECT);
@@ -789,6 +794,60 @@ function submitImage($conn, $planID, $levelFourID, $image, $caption){
 		}
 	}
 }
+
+
+//SL
+//Function to Submit images for the author
+function submitAuthorImage($conn, $authorID, $image) {
+
+    $target_dir = "uploads/report/authors";
+    if(!(is_dir($target_dir))){
+	mkdir($target_dir);
+    }
+    
+    $target_file = $target_dir . basename($image["name"]);
+    $uploadOk = 1;
+    $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+
+// Check if image file is a actual image or fake image
+    if(isset($_POST["submit"])) {
+        $check = getimagesize($image["tmp_name"]);
+	if($check !== false) {
+            $uploadOk = 1;
+	} else {
+            $return = ['message' => "File is not an image."];
+            return $return;
+	}
+    }
+	
+// Check if file already exists
+    if (file_exists($target_file)) {
+        unlink($target_file);
+    }
+
+// Allow only jpg, png, gif and jpeg
+    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+        && $imageFileType != "gif" ) {
+	$return = ['message' => "Sorry, only JPG, JPEG, PNG & GIF files can be uploaded."];
+	return $return;
+    }
+
+	// if everything is ok, try to upload file
+    if (move_uploaded_file($image["tmp_name"], $target_file)) {
+        $return = ['message' => "The file ". basename( $image["name"]). " has been uploaded."];
+	$sql = "UPDATE author SET image = (:pictureURI) WHERE authorId = (:authorID)";
+	$sth = $conn->prepare($sql);
+	$sth->bindParam(':authorID', authorID, PDO::PARAM_INT, 11);
+	$sth->bindParam(':pictureURI', $target_file, PDO::PARAM_STR, 45);
+	$sth->execute();
+	$sth->closeCursor();
+	return $return;
+    } else{
+        $return = ['message' => "Sorry there was an error uploading your file."];
+        }
+}
+//SL E
+
 
 //Basic getter for a component (completed by an inspector) based on a levelFourID
 function getModule($conn, $planID, $levelFourID){
@@ -2016,10 +2075,15 @@ function getAccessLevels($conn){
 	}
 	return $rows;
 }
-
-
 //Function to terminate session.
-function logout(){
-    
+function submitLogOutRequest(){
+     session_start();
+     			$_SESSION['loggedIn'] = NULL;
+			$_SESSION['userID'] = NULL;
+			$_SESSION['accessLevel'] = NULL;
+     session_destroy();
+                    return true;
+
 }
+
 ?>

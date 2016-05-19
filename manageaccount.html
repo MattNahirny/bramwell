@@ -14,6 +14,44 @@ and open the template in the editor.
         <script type="text/javascript" src="script/manageaccount.js"></script>
     </head>
     <body>
-        <div>TODO write content</div>
+        
+         <div id="manageAcctContainer">
+
+            <div class="acctManagementButtonContainer">
+		<input type="button" class="acctButton" value="Change Username">
+		<input type="button" class="acctButton" value="Change Password">
+                <input type="button" class="acctButton" value="Return to Menu">
+             </div>
+	</div>
+        
+        <div id="editUsernameContainer">
+		<table id="editUsernameTable">
+			<tr>
+				<th>Username</th>
+				<th>New Username</th>
+                                <th>Password</th>
+                                <th> <th>
+			</tr>
+		</table>
+            <div id="editUsernameButtonContainer">
+		<input type="button" class="btnCancel" value="Cancel and Return">
+		<input type="button" id="btnSubmitAccountUpdate" value="Save and Continue">
+             </div>
+	</div>
+        
+         <div id="editPasswordContainer">
+		<table id="passwordTable">
+			<tr>
+				<th>Old Password</th>
+				<th>New Password</th>
+                                <th> </th>
+			</tr>
+                        
+		</table>
+            <div id="editUsernameButtonContainer">
+		<input type="button" class="btnCancel" value="Cancel and Return">
+		<input type="button" id="btnSubmitAccountUpdate" value="Save and Continue">
+             </div>
+	</div>
     </body>
 </html>

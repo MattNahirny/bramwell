@@ -204,7 +204,7 @@ function deleteConstructionInfo(constructInfoID){
 
 	var data = {
 		"request" : "deleteConstructionInfo",
-		"constructInfoID" : constructInfoID,
+		"constructInfoID" : constructInfoID
 	};
 	
 	var submitConstructInfo = $.ajax({url : 'script/server.php', method: 'POST', data : data, dataType:'json'});
@@ -278,7 +278,7 @@ function prepareEditUserTable(){
 		
 		$(".editUserRow").on("click", function(){
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentUsername = $(this).parent().siblings('.username').text();
 				var currentEmail = $(this).parent().siblings('.email').text();
@@ -304,9 +304,10 @@ function prepareEditUserTable(){
 				
 				var currentUsername = $(this).parent().siblings(".username").children("input").val();
 				var currentEmail = $(this).parent().siblings(".email").children("input").val();
-				var currentAccessLevel = $(this).parent().siblings(".accessLevel").children("input").val();
-				
-				if(isNumeric(currentAccessLevel).value){
+				var currentAccessLevel = parseInt($(this).parent().siblings(".accessLevel").children("select").val());
+				console.log(typeof currentAccessLevel); //debugging
+                                console.log(currentAccessLevel);
+				if(isNumeric(currentAccessLevel)){
 					$(this).parent().siblings('.username').empty();
 					$(this).parent().siblings('.username').text(currentUsername);
 					
@@ -314,7 +315,7 @@ function prepareEditUserTable(){
 					$(this).parent().siblings('.email').text(currentEmail);
 					
 					$(this).parent().siblings('.accessLevel').empty();
-					$(this).parent().siblings('.accessLevel').value(currentAccessLevel);
+					$(this).parent().siblings('.accessLevel').text(currentAccessLevel);
 				}
 				else{
 					window.alert("Non numeric value!");
@@ -387,7 +388,7 @@ function submitClient(){
 		"lastName" : lastName,
 		"company" : company,
 		"address" : address,
-		"city" : city,
+		"city" : city
 	};
 	
 	console.log(data);
@@ -412,7 +413,7 @@ function submitClient(){
 function prepareEditClientTable(){
 
 	var data = {
-		"request" : "getClients",
+		"request" : "getClients"
 	};
 	console.log(data);
 	var getClient = $.ajax({url : 'script/server.php', method: 'GET', data : data, dataType:'json'});
@@ -442,7 +443,7 @@ function prepareEditClientTable(){
 		$(".editClientRow").on("click", function(){
 			
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentFirstName = $(this).parent().siblings('.firstName').text();
 				var currentLastName = $(this).parent().siblings('.lastName').text();
@@ -589,7 +590,7 @@ function submitInspector(){
 function prepareEditInspectorTable(){
 	
 	var data = {
-		"request" : "getInspectors",
+		"request" : "getInspectors"
 	};
 	console.log(data);
 	var getInspectors = $.ajax({url : 'script/server.php', method: 'GET', data : data, dataType:'json'});
@@ -618,7 +619,7 @@ function prepareEditInspectorTable(){
 		$(".editInspectorRow").on("click", function(){
 			
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentFirstName = $(this).parent().siblings('.firstName').text();
 				var currentLastName = $(this).parent().siblings('.lastName').text();

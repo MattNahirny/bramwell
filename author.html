@@ -15,6 +15,65 @@ and open the template in the editor.
     </head>
     
     <body>
-        <div>TODO write content</div>
+        <!--Main menu for Author -->
+        <div id="authorNavigation" class="authorContainer">
+            <input type="button" id="addAuthorBtn" class="authorBtn" onclick="showAuthorAdd()" value="Add Author">
+            <input type="button" id="editAuthorBtn" class="authorBtn" onclick="showAuthorEdit()" value="Edit Author">
+            <input type="button" id="authorExitBtn" class="authorBtn"  onclick="toMainMenu()" value="Return to Menu">
+        </div>
+        <!--Main Menu Ends -->
+        
+        <!--Create Author Begins -->
+            <div id="createAuthorContainer" class="authorContainer">
+                <form name="createAuthorForm">
+                    <label class="bold">Create Author: </label>
+                    
+                    <div class="authorChoiceGroup">
+                        <!-- -->
+                        <div class="authorInputRow">
+                            <label>Full Name: </label>
+                            <input type="text" id="inputAuthorName">
+                        </div>
+                        <!-- -->
+                        <div class="authorInputRow">
+                            <label>Title: </label>
+                            <input type="text" id="inputAuthorTitle">
+                        </div>
+                        <!-- -->
+                        <div class="authorInputRow">
+                            <label>Description: </label>
+                            <textarea  id="inputAuthorDescription"></textarea>
+                        </div>
+                        <!-- -->
+                        <div class="authorInputRow">
+                            <label>Picture:</label>
+                            <input  id="browseBtn" type="file">
+                        </div>
+                    </div>
+                        <!-- -->
+                        <input type="button" id="addReturnBtn" class="cancelButton" onclick="showAuthorMenu()" value="Return to Menu">
+                        <!-- -->
+                        <input type="button" id="addAuthorBtn" class="save" value="Submit Author">
+		</form>
+        </div>
+        <!-- Create Author Ends -->
+        
+        <!-- Edit Author Begins -->
+        <div id="editAuthorContainer" class="authorContainer">
+            <table id="editAuthorTable">
+			<tr>
+				<th>Name</th>
+				<th>Title</th>
+				<th>Image</th>
+				<th>Description</th>
+				<th> </th>
+			</tr>
+            <div id="editAuthorButtonContainer">
+			<input type="button" id="editReturnButton" class="cancelButton" onclick="showAuthorMenu()" value="Cancel and Return">
+			<input type="button" id="submitAuthorUpdateBtn" value="Save and Continue">
+            </div>
+        </div>
+        
+        <!-- Edit Author Ends -->
     </body>
 </html>
