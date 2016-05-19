@@ -1,0 +1,41 @@
+@media (min-width: 0px) and (max-width: 320px){
+	#createModuleContainer {
+	border-style:solid;
+	border-width:thin;
+	width:250px;
+	padding: 10px;
+	}
+	.save {
+	padding:10px;
+	margin-top:20px;
+	margin-left:25%;
+	}
+	#createModuleContainer label:not(.bold){
+	margin-left: 0px;
+	width:53px;
+	}
+	#createModuleContainer input:not(.addCommentButton):not(.save) {
+	margin-left:%;
+	}
+}
+
+@media (min-width: 325px) and (max-width: 414px){
+	#createModuleContainer {
+	border-style:solid;
+	border-width:thin;
+	width:350px;
+	padding: 10px;
+	}
+	.save {
+	padding:10px;
+	margin-top:20px;
+	margin-left:29%;
+	}
+	#createModuleContainer label:not(.bold){
+	margin-left: 0px;
+	width:20%;
+	}
+	#createModuleContainer input:not(.addCommentButton):not(.save) {
+	margin-left:%;
+	}
+}
