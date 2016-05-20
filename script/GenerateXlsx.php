@@ -34,91 +34,91 @@ class GenerateXlsx
                                 ON leveltwo.LevelOneId = levelone.LevelOneId
                                 WHERE plan.PlanId = :planID';
 
-        $this->aux = array();
+        $this->reportValues = array();
 
         // sched c1 th,   F15
-        $this->aux['AnnualReserveFundContributions'][0] = array('year'=>2014, 'value'=>2400);
+        $this->reportValues['AnnualReserveFundContributions'][0] = array('year'=>2014, 'value'=>2400);
         // sched c1 th,   G15
-        $this->aux['AnnualReserveFundContributions'][1] = array('year'=>2015, 'value'=>2640);
+        $this->reportValues['AnnualReserveFundContributions'][1] = array('year'=>2015, 'value'=>2640);
         // sched c1 th,   L19
-        $this->aux['AnnualReserveFundContributions'][2] = array('year'=>2020, 'value'=>51961);
+        $this->reportValues['AnnualReserveFundContributions'][2] = array('year'=>2020, 'value'=>51961);
 //pg 6
         // i think it on the loop to get the compoenents.. u have a cout for it if iremember.
-        $this->aux['ReserveFundGroups'][0] = array('name'=>'Site Improvements Reserve Components', 'total'=>10);
+        $this->reportValues['ReserveFundGroups'][0] = array('name'=>'Site Improvements Reserve Components', 'total'=>10);
         // can be any number of level1 total, name. COUNT for each level1 id
-        $this->aux['ReserveFundGroups'][1] = array('name'=>'Consultant Report', 'total'=>1);
+        $this->reportValues['ReserveFundGroups'][1] = array('name'=>'Consultant Report', 'total'=>1);
         // basic info,    C17
-        $this->aux['Year1ReserveAdequacy']        = "37";
+        $this->reportValues['Year1ReserveAdequacy']        = "37";
         // basic info,    C18
-        $this->aux['Year30ReserveAdequacy']       = "60";
+        $this->reportValues['Year30ReserveAdequacy']       = "60";
         // sched A,    J16
-        $this->aux['CurrentReplacementCost']      = "162713";
+        $this->reportValues['CurrentReplacementCost']      = "162713";
         // sched A,    K16
-        $this->aux['FutureReplacementCost']       = "501654";
+        $this->reportValues['FutureReplacementCost']       = "501654";
         // sched A,    L16
-        $this->aux['CurrentReserveFundCostReq']   = "63643";
+        $this->reportValues['CurrentReserveFundCostReq']   = "63643";
         // sched A,    M16
-        $this->aux['FutureReserveFundAcc']        = "95298";
+        $this->reportValues['FutureReserveFundAcc']        = "95298";
         // sched A,    N16
-        $this->aux['FutureReserveFundReq']        = "406356";
+        $this->reportValues['FutureReserveFundReq']        = "406356";
         // sched A,    O16
-        $this->aux['ReserveFundAnnualCon']        = "10218";
+        $this->reportValues['ReserveFundAnnualCon']        = "10218";
 //pg 16
         // sched c1 th,     F15
-        $this->aux['ReserveFundClosingBalance'][0] = array('date'=>'2013-12-31', 'value'=>22027);
+        $this->reportValues['ReserveFundClosingBalance'][0] = array('date'=>'2013-12-31', 'value'=>22027);
         // sched C1 CFT,    C4
-        $this->aux['RecommendedAnnualRFContr'] = "1500";
+        $this->reportValues['RecommendedAnnualRFContr'] = "1500";
         // sched C1 CFT,    F41
-        $this->aux['ReserveAdequacy'] = "37";
+        $this->reportValues['ReserveAdequacy'] = "37";
         // ? C1 TH
-        $this->aux['MonthlyASLContributions'][0] = array('year'=>'2014', 'value'=>20.00);
+        $this->reportValues['MonthlyASLContributions'][0] = array('year'=>'2014', 'value'=>20.00);
         // ?
-        $this->aux['MonthlyASLContributions'][1] = array('year'=>'2019', 'value'=>32.21);
+        $this->reportValues['MonthlyASLContributions'][1] = array('year'=>'2019', 'value'=>32.21);
 //pg65
         // ?
-        $this->aux['MonthlyASLContributions'][2] = array('year'=>'2015', 'value'=>22.00);
+        $this->reportValues['MonthlyASLContributions'][2] = array('year'=>'2015', 'value'=>22.00);
 //pg 60
 
-        $this->aux['OpeningBalanceDate'] = "2014-01-01";
+        $this->reportValues['OpeningBalanceDate'] = "2014-01-01";
 
-        $this->aux['OpeningBalanceValue'] = "22027";
+        $this->reportValues['OpeningBalanceValue'] = "22027";
 
-        $this->aux['CurrentBudgetedAnnualRFC'] = "2400";
+        $this->reportValues['CurrentBudgetedAnnualRFC'] = "2400";
 
-        $this->aux['AuthorizedSpecialLeveies'] = "0";
+        $this->reportValues['AuthorizedSpecialLeveies'] = "0";
 
-        $this->aux['Borrowings'] = "0";
+        $this->reportValues['Borrowings'] = "0";
 
-        $this->aux['LoanRefinance'] = "0";
+        $this->reportValues['LoanRefinance'] = "0";
 
-        $this->aux['ReserveFundTaxFreeAnnualIntIncome'] = "330";
+        $this->reportValues['ReserveFundTaxFreeAnnualIntIncome'] = "330";
 
-        $this->aux['LessRepaymentOfFinancingLoan'] = "0";
+        $this->reportValues['LessRepaymentOfFinancingLoan'] = "0";
 
-        $this->aux['LessReserveFundBudgetCurrentFYear'] = "-1575";
+        $this->reportValues['LessReserveFundBudgetCurrentFYear'] = "-1575";
 
-        $this->aux['ProjectedReserveFundBalanceDate'] = "2014-12-31";
+        $this->reportValues['ProjectedReserveFundBalanceDate'] = "2014-12-31";
 
-        $this->aux['ProjectedReserveFundBalanceValue'] = "23182";
+        $this->reportValues['ProjectedReserveFundBalanceValue'] = "23182";
 
-        $this->aux['EstimatedReserveFund_Shortfall'] = "62068";
+        $this->reportValues['EstimatedReserveFund_Shortfall'] = "62068";
 
-        $this->aux['BudgetTransferFromDate'] = "2015-01-01";
+        $this->reportValues['BudgetTransferFromDate'] = "2015-01-01";
 
-        $this->aux['BudgetTransferFromValue'] = "6000";
+        $this->reportValues['BudgetTransferFromValue'] = "6000";
 
-        $this->aux['ProposedSpecialLeveiesDate'] = "2015-01-01";
+        $this->reportValues['ProposedSpecialLeveiesDate'] = "2015-01-01";
 
-        $this->aux['ProposedSpecialLeveiesValue'] = "33468";
+        $this->reportValues['ProposedSpecialLeveiesValue'] = "33468";
 
-        $this->aux['EstimatedReserveFundAdequacy'] = "100";
+        $this->reportValues['EstimatedReserveFundAdequacy'] = "100";
 //pg62
 
-        $this->aux['EstimatedReserveFundDeficiency'] = "38885";
+        $this->reportValues['EstimatedReserveFundDeficiency'] = "38885";
 
-        $this->aux['ReserveAdequacyDate'] = "2014-12-31";
+        $this->reportValues['ReserveAdequacyDate'] = "2014-12-31";
 
-        $this->aux['ReserveAdequacyValue'] = "37";
+        $this->reportValues['ReserveAdequacyValue'] = "37";
 
 
 
@@ -149,6 +149,11 @@ class GenerateXlsx
 
     function dummp($data) {
         echo '<pre>' . var_export($data, true) . '</pre>';exit;
+    }
+
+    function getReportValues()
+    {
+        return $this->reportValues;
     }
 
     function run()
@@ -685,7 +690,7 @@ class GenerateXlsx
 
         for($i = (5 + $curRow); $i < (10 + $curRow); $i++)
         {
-            //echo 'hello' . $i . $importantinfo[($i - 5 - $curRow)]['A'] . $importantinfo[($i - 5 - $curRow)]['C'] . '<br>';
+
             $this->SchedASheet->SetCellValue('A' . $i, $importantinfo[($i - 5 - $curRow)]['A']);
             $this->SchedASheet->SetCellValue('C' . $i, $importantinfo[($i - 5 - $curRow)]['C']);
             $cursor = $i;
@@ -820,13 +825,13 @@ class GenerateXlsx
         //the totals
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Total Expenditures');
         $totalExpendituresRow = $cursor;
-        $cursor += 2;
+        $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Fund Closing Balance');
         $RFClosingBalanceRow = $cursor;
-        $cursor += 2;
+        $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Fund Requirements');
         $RFRequirementseRow = $cursor;
-        $cursor += 2;
+        $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Surplus (Deficiency)');
         $reserveSurplusDeficiencyRow = $cursor;
         $cursor++;
@@ -1001,28 +1006,327 @@ class GenerateXlsx
         for ($i = $cursor, $j = 0; $j < 10; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue('A' . $i , $largeTableArray1[$j]);
+            $componentsRowStart = ($i+1);
         }
 
-        //$this->SchedC1THSheet->SetCellValue(,);
+        //Column C
+        $columnC = array(
+            '=\'Basic Info\'!C14',
+            '=\'Basic Info\'!$C$16',
+            '=\'Basic Info\'!C8',
+            'Current Reserve Fund Requirements',
+            '',
+            '',
+            'Current Reserve Fund Requirements'
+        );
+        for ($i = ($largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
+        }
+        //YEARS 1-15 NONCOMPONENT VALUES
+        $nonComponent1to15 = array(
+            12, 14, 15, 16, 17, 18, 19
+        );
+        $largeTable15YearsRange = range('D', 'R');
 
-        //$this->SchedC1THSheet->SetCellValue(,);
+        for($i = ($largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        {
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $l = $letter;
+                ++$l;++$l;
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . $nonComponent1to15[$j]);
+            }
+        }
+        //YEARS 1-15 COMPONENTS
+        $years1to15ComponentsRange = range('A', 'R');
 
+        $schedAComponentRows = 4;
+        for($i = $componentsRowStart, $j = 0; $j < $this->numComponents; $i++, $j++)
+        {
 
+            if ($this->SchedASheet->getCell('L' . $schedAComponentRows)->getValue() == NULL)
+                $schedAComponentRows++;
+            foreach($years1to15ComponentsRange as $letter)
+            {
+                $l = $letter; ++$l;++$l;
+                if($letter == 'C')
+                {
+                    $this->SchedC1THSheet->SetCellValue( $letter . $i, '=\'Sched. A\'!L' . ($j + $schedAComponentRows));
+                }
+                else
+                {
+                    if ($letter == 'A' || $letter == 'B')
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $letter . ($j + 22));
+                    }
+                    else
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($j + 22));
+                    }
+
+                }
+            }
+            $afterComponents = ($i+1);
+        }
+
+        //YEARS 1-15 AFTER COMPONENTS
+        $afterComponentsArray = array(
+            'TOTAL RESERVE FUND EXPENDITURES',
+            'Reserve Fund Closing Balance',
+            'Reserve Fund Requirements',
+            'Reserve Surplus (Deficiency)',
+            'Reserve Adequacy',
+            'Monthly ASL Contributions',
+            'Annual ASL Contributions',
+            'Annual ASL Possible Special Levies',
+            'Total Annual ASL Contributions and Special Levies',
+        );
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
+            $largeTable16To30Start = ($i + 2);
+        }
+        $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
+        //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
+
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $l = $letter;
+                ++$l;++$l;
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+            }
+        }
 
         //STYLED LARGE TABLE YEARS 16-30
+        $cursor = $largeTable16To30Start;
+        //TOP ROW WITH TITLES
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
+        $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
+        $this->SchedC1THSheet->SetCellValue('D' . $cursor, '  Schedule C.1 – THRESHOLD MODEL – 30 Year RESERVE FUND CASH FLOW PROJECTION AND DEFICIENCY ANALYSIS');
+        $this->SchedC1THSheet->SetCellValue('R' . $cursor, 'Years 16 - 30');
+        $cursor++;
+        //title of next section
+        for ($i = $cursor, $j = 0; $j < 10; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . $i , $largeTableArray1[$j]);
+            $componentsRowStart = ($i+1);
+        }
 
+        for ($i = ($largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
+        }
+        //YEARS 16-30 NONCOMPONENT VALUES
+        for($i = ($largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        {
+            $l = 'U';
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . $nonComponent1to15[$j]);
+                ++$l;
+            }
+        }
+        //YEARS 16-30 COMPONENTS
+        $years1to15ComponentsRange = range('A', 'R');
 
+        for($i = $componentsRowStart, $j = 0; $j < $this->numComponents; $i++, $j++)
+        {
+            $l = 'U';
+            if ($this->SchedASheet->getCell('L' . $schedAComponentRows)->getValue() == NULL)
+                $schedAComponentRows++;
+            foreach($years1to15ComponentsRange as $letter)
+            {
+                if($letter == 'C')
+                {
+                    $this->SchedC1THSheet->SetCellValue( $letter . $i, '=\'Sched. A\'!L' . ($j + $schedAComponentRows));
+                }
+                else
+                {
+                    if ($letter == 'A' || $letter == 'B')
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $letter . ($j + 22));
+                    }
+                else
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($j + 22));
+                    }
+                }
+                ++$l;
+            }
+            $afterComponents = ($i+1);
+        }
 
-
+        //YEARS 16-30 AFTER COMPONENTS
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
+            $smallTable1To15Start = ($i + 2);
+        }
+        $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
+        //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $l = 'U';
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                ++$l;
+            }
+        }
 
         //STYLED SMALL TABLE YEARS 1-15
+        $cursor = $smallTable1To15Start;
+        //TOP ROW WITH TITLES
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
+        $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
+        $this->SchedC1THSheet->SetCellValue('D' . $cursor, '  Schedule C.1 – THRESHOLD MODEL – 30 Year RESERVE FUND CASH FLOW PROJECTION AND DEFICIENCY ANALYSIS');
+        $this->SchedC1THSheet->SetCellValue('R' . $cursor, 'Years 1 - 15');
+        $cursor++;
 
 
+        //title of next section
+        for ($i = $cursor, $j = 0; $j < 10; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . $i , $largeTableArray1[$j]);
+            $componentsRowStart = ($i+1);
+        }
 
+        //Column C
+        for ($i = ($smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
+        }
+        //YEARS 1-15 NONCOMPONENT VALUES
+        for($i = ($smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        {
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $l = $letter;
+                ++$l;++$l;
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . $nonComponent1to15[$j]);
+            }
+        }
+        //YEARS 1-15 COMPONENTS
+        $schedAComponentRows = 4;
+        for($i = $componentsRowStart, $j = 0; $j < $this->numComponents; $i++, $j++)
+        {
+            if ($this->SchedASheet->getCell('L' . $schedAComponentRows)->getValue() == NULL)
+                $schedAComponentRows++;
+            foreach($years1to15ComponentsRange as $letter)
+            {
+                $l = $letter; ++$l;++$l;
+                if($letter == 'C')
+                {
+                    $this->SchedC1THSheet->SetCellValue( $letter . $i, '=\'Sched. A\'!L' . ($j + $schedAComponentRows));
+                }
+                else
+                {
+                    if ($letter == 'A' || $letter == 'B')
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $letter . ($j + 22));
+                    }
+                    else
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($j + 22));
+                    }
 
-
+                }
+            }
+            $afterComponents = ($i+1);
+        }
+        //YEARS 1-15 AFTER COMPONENTS
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
+            $smallTable16To30Start = ($i + 2);
+        }
+        $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
+        //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $l = $letter;
+                ++$l;++$l;
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+            }
+        }
         //STYLED SMALL TABLE YEARS 16-30
+        $cursor = $smallTable16To30Start;
+        //TOP ROW WITH TITLES
+        $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
+        $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
+        $this->SchedC1THSheet->SetCellValue('D' . $cursor, '  Schedule C.1 – THRESHOLD MODEL – 30 Year RESERVE FUND CASH FLOW PROJECTION AND DEFICIENCY ANALYSIS');
+        $this->SchedC1THSheet->SetCellValue('R' . $cursor, 'Years 16 - 30');
+        $cursor++;
+        //title of next section
+        for ($i = $cursor, $j = 0; $j < 10; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('A' . $i , $largeTableArray1[$j]);
+            $componentsRowStart = ($i+1);
+        }
 
+        for ($i = ($smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
+        }
+        //YEARS 16-30 NONCOMPONENT VALUES
+        for($i = ($smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        {
+            $l = 'U';
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . $nonComponent1to15[$j]);
+                ++$l;
+            }
+        }
+        //YEARS 16-30 COMPONENTS
+        for($i = $componentsRowStart, $j = 0; $j < $this->numComponents; $i++, $j++)
+        {
+            $l = 'U';
+            if ($this->SchedASheet->getCell('L' . $schedAComponentRows)->getValue() == NULL)
+                $schedAComponentRows++;
+            foreach($years1to15ComponentsRange as $letter)
+            {
+                if($letter == 'C')
+                {
+                    $this->SchedC1THSheet->SetCellValue( $letter . $i, '=\'Sched. A\'!L' . ($j + $schedAComponentRows));
+                }
+                else
+                {
+                    if ($letter == 'A' || $letter == 'B')
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $letter . ($j + 22));
+                    }
+                    else
+                    {
+                        $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($j + 22));
+                    }
+                }
+                ++$l;
+            }
+            $afterComponents = ($i+1);
+        }
+
+        //YEARS 16-30 AFTER COMPONENTS
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
+        }
+        $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
+        //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
+        for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
+        {
+            $l = 'U';
+            foreach($largeTable15YearsRange as $letter)
+            {
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                ++$l;
+            }
+        }
 
     }
 
