@@ -122,29 +122,6 @@ class GenerateXlsx
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     function dummp($data) {
@@ -161,9 +138,10 @@ class GenerateXlsx
         $this->setup();
         $this->getBasicInfo();
         $this->getTally();
-        $this->getComparison();
         $this->getScheduleA();
         $this->getScheduleC1TH();
+        $this->getComparison();
+        $this->getScheduleC1TF();
         $this->save();
     }
 
@@ -497,6 +475,7 @@ class GenerateXlsx
 
     function setupComparison()
     {
+        //COMPARISON IS TOTALLY BROKEN
         $columnA_1 = array(
             'Operating Budget',
             'Year 1 Reserve Fund Requirement',
@@ -524,7 +503,7 @@ class GenerateXlsx
             'Schedule C.1 –  THRESHOLD MODEL',
             'RECOMMENDED MODEL',
             '=\'Basic Info\'!$D$23',
-            '=\'Sched. A\'!$L$59',
+            '=\'Sched. A\'!$L$' . $this->schedATotalsRow,
             '=\'Sched. C.1 TH\'!F78',
             '=\'Sched. C.1 TH\'!F14',
             '=\'Sched. C.1 TH\'!E71',
@@ -551,7 +530,7 @@ class GenerateXlsx
             'Schedule C.2  –  FULLY FUNDED MODEL',
             'FULLY FUNDED MODEL',
             '=\'Basic Info\'!$D$23',
-            '=\'Sched. A\'!$L$59',
+            '=\'Sched. A\'!$L$' . $this->schedATotalsRow,
             '=\'Sched. C.2 FF\'!F73',
             '=\'Sched. C.2 FF\'!F10',
             '=\'Sched. C.2 FF\'!E67',
@@ -577,7 +556,7 @@ class GenerateXlsx
             'Schedule C.3 –  UNFUNDED \'PAY AS YOU GO\' MODEL',
             'EXISTING MODEL',
             '=\'Basic Info\'!$D$23',
-            '=\'Sched. A\'!$L$59',
+            '=\'Sched. A\'!$L$' . $this->schedATotalsRow,
             '=\'Sched. C.3  UN\'!F78',
             '=\'Sched. C.3  UN\'!F14',
             '=\'Sched. C.3  UN\'!E71',
@@ -717,7 +696,7 @@ class GenerateXlsx
         for($i = 0; $i < 9; $i++)
         {
             $this->SchedASheet->SetCellValue('A' . $cursor, $benchmark[$i]['A']);
-            $this->SchedASheet->SetCellValue('A' . $cursor, $benchmark[$i]['E']);
+            $this->SchedASheet->SetCellValue('E' . $cursor, $benchmark[$i]['E']);
             $cursor++;
         }
 
@@ -824,7 +803,7 @@ class GenerateXlsx
         $cursor += 2;
         //the totals
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Total Expenditures');
-        $totalExpendituresRow = $cursor;
+        $this->totalExpendituresRow = $cursor;
         $cursor++;
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Reserve Fund Closing Balance');
         $RFClosingBalanceRow = $cursor;
@@ -940,20 +919,23 @@ class GenerateXlsx
                 }
             }
         }
-        $this->SchedC1THSheet->SetCellValue('E' . ($totalExpendituresRow - 1), '=SUM(E22:E' . $lastComponentRow . ')');
+        $this->SchedC1THSheet->SetCellValue('E' . ($this->totalExpendituresRow - 1), '=SUM(E22:E' . $lastComponentRow . ')');
         foreach ($cellRange3 as $letter)
         {
-            $this->SchedC1THSheet->SetCellValue( $letter . $totalExpendituresRow, '=SUM('. $letter . 22 . ':' . $letter . $lastComponentRow . ')');
+            $this->SchedC1THSheet->SetCellValue( $letter . $this->totalExpendituresRow, '=SUM('. $letter . 22 . ':' . $letter . $lastComponentRow . ')');
         }
-        $this->SchedC1THSheet->SetCellValue( $letter . $RFClosingBalanceRow, '=+' . $letter . '19-' . $letter . $lastComponentRow);
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . $RFClosingBalanceRow, '=+' . $letter . '19-' . $letter . $this->totalExpendituresRow);
+        }
         //L59 needs to be set up properly for variable amounts of components
-        $this->SchedC1THSheet->SetCellValue( 'F' . $RFRequirementseRow, '=\'Sched. A\'!L' . $this->schedATotalsRow . '-F' . $totalExpendituresRow);
+        $this->SchedC1THSheet->SetCellValue( 'F' . $RFRequirementseRow, '=\'Sched. A\'!L' . $this->schedATotalsRow . '-F' . $this->totalExpendituresRow);
         $lastCol = 'F';
         foreach($cellRange3 as $letter)
         {
             if ($letter == 'F')
                 continue;
-            $this->SchedC1THSheet->SetCellValue( $letter . $RFRequirementseRow, '=(+' . $lastCol . $RFRequirementseRow . '*(1+\'Basic Info\'!$C$16))+\'Sched. A\'!$O$' . $this->schedATotalsRow . '-' . $letter . $totalExpendituresRow);
+            $this->SchedC1THSheet->SetCellValue( $letter . $RFRequirementseRow, '=(+' . $lastCol . $RFRequirementseRow . '*(1+\'Basic Info\'!$C$16))+\'Sched. A\'!$O$' . $this->schedATotalsRow . '-' . $letter . $this->totalExpendituresRow);
             $lastCol = $letter;
         }
 
@@ -1096,7 +1078,7 @@ class GenerateXlsx
             {
                 $l = $letter;
                 ++$l;++$l;
-                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
             }
         }
 
@@ -1172,7 +1154,7 @@ class GenerateXlsx
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
             {
-                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
                 ++$l;
             }
         }
@@ -1251,7 +1233,7 @@ class GenerateXlsx
             {
                 $l = $letter;
                 ++$l;++$l;
-                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
             }
         }
         //STYLED SMALL TABLE YEARS 16-30
@@ -1323,11 +1305,10 @@ class GenerateXlsx
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
             {
-                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($totalExpendituresRow + $j));
+                $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
                 ++$l;
             }
         }
-
     }
 
     function getScheduleC1TF()
@@ -1338,6 +1319,73 @@ class GenerateXlsx
 
     function setupScheduleC1TF()
     {
+        //TITLES OF TABLE 1
+        $this->SchedC1CTFSheet->SetCellValue( 'A' . 1 , 'Strata:');
+        $this->SchedC1CTFSheet->SetCellValue( 'C' . 1, '=\'Basic Info\'!$C$2');
+        $this->SchedC1CTFSheet->SetCellValue( 'D' . 1, '  30 YEAR RESERVE FUND CASH FLOW TABLE');
+        $this->SchedC1CTFSheet->SetCellValue( 'A' . 2, 'Fiscal Year End');
+        $this->SchedC1CTFSheet->SetCellValue( 'A' . 3, '=\'Basic Info\'!C8');
+        $this->SchedC1CTFSheet->SetCellValue( 'A' . 34, 'Totals over 30 years');
+        $this->SchedC1CTFSheet->SetCellValue( 'A' . 35, 'Average per year over 30 years');
+        $titlesArray = array(
+            'Reserve Fund Opening Balance',
+            'Recommended Annual RF Contributions',
+            'Percentage Increase in RF Contributions',
+            'Possible Special Levies',
+            'Borrowings and Loan Financing',
+            'Estimated Reserve Fund Interest Earned',
+            'Estimated Inflation Adjusted Expenditures',
+            'Reserve Fund Closing Balance',
+            'Total Annual ASL Contributions and Special Levies',
+            'Monthly ASL Contributions',
+            'Annual ASL Possible Special Levies',
+        );
+        $i = 0;
+        foreach( range('B', 'L') as $letter)
+        {
+            $this->SchedC1CTFSheet->SetCellValue( $letter . 2, $titlesArray[$i]);
+            $i++;
+        }
+
+        //The INNER PORTION OF TABLE 1
+        $columnsRange = range('A', 'G');
+        $yearsRange = range('F','Z');
+        foreach(range('A', 'I') as $letter)
+        {
+            array_push($yearsRange, 'A' . $letter);
+        }
+        $aids = array(12, 14, 15, 16, 17, 18);
+        for ($i = 0; $i < 30; $i++)
+        {
+            if ($i != 0)
+                $this->SchedC1CTFSheet->SetCellValue('D' . ($i+4),'=(C' . ($i+4) . '/C' . ($i+3) . ')-100%');
+            $j = 0;
+            foreach($columnsRange as $letter)
+            {
+                if($letter == 'D')
+                    continue;
+                $this->SchedC1CTFSheet->SetCellValue( $letter . ($i+4), '=\'Sched. C.1 TH\'!$' . $yearsRange[$i] . '$' .  $aids[$j]);
+                $j++;
+            }
+            $this->SchedC1CTFSheet->SetCellValue( 'H' . ($i+4), '=\'Sched. C.1 TH\'!$' . $yearsRange[$i] . '$' . $this->totalExpendituresRow);
+            $this->SchedC1CTFSheet->SetCellValue( 'I' . ($i+4), '=\'Sched. C.1 TH\'!$' . $yearsRange[$i] . '$' . ($this->totalExpendituresRow + 1));
+            $this->SchedC1CTFSheet->SetCellValue( 'J' . ($i+4),'=(C' . ($i+4) . '+E' . ($i+4) .')/\'Basic Info\'!$C$3');
+            $this->SchedC1CTFSheet->SetCellValue( 'K' . ($i+4),'=C' . ($i+4) . '/\'Basic Info\'!$C$3/12');
+            $this->SchedC1CTFSheet->SetCellValue( 'L' . ($i+4),'=E' . ($i+4) . '/\'Basic Info\'!$C$3');
+        }
+        //SUMS AT BOTTOM
+        $this->SchedC1CTFSheet->SetCellValue( 'C' . 34, '=SUM(C4:C33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'E' . 34, '=SUM(E4:E33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'G' . 34, '=SUM(G4:G33)');
+
+        $this->SchedC1CTFSheet->SetCellValue( 'H' . 34, '=SUM(H4:H33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'J' . 34, '=SUM(J4:J33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'L' . 34, '=SUM(L4:L33)');
+
+        $this->SchedC1CTFSheet->SetCellValue( 'J' . 35, '=AVERAGE(J4:J33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'K' . 35, '=AVERAGE(K4:K33)');
+        $this->SchedC1CTFSheet->SetCellValue( 'L' . 35, '=AVERAGE(L4:L33)');
+
 
     }
 
