@@ -204,7 +204,7 @@ function deleteConstructionInfo(constructInfoID){
 
 	var data = {
 		"request" : "deleteConstructionInfo",
-		"constructInfoID" : constructInfoID,
+		"constructInfoID" : constructInfoID
 	};
 	
 	var submitConstructInfo = $.ajax({url : 'script/server.php', method: 'POST', data : data, dataType:'json'});
@@ -254,13 +254,9 @@ function submitUser(){
 //Pretty much the same as costing table,
 //Delicate jQuery to make it all work, beware changing the table structure.
 function prepareEditUserTable(){
-
-	var data = {
-		"request" : "getUsers",
-	};
+	var data = {"request" : "getUsers"};
 	console.log(data);
 	var getUsers = $.ajax({url : 'script/server.php', method: 'GET', data : data, dataType:'json'});
-	
 	getUsers.success(function(data){
 		$("#editUserTable tr:not(:first-child)").remove();
 		for(count in data){
@@ -281,9 +277,8 @@ function prepareEditUserTable(){
 		$("#editUserContainer").fadeIn();
 		
 		$(".editUserRow").on("click", function(){
-			
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentUsername = $(this).parent().siblings('.username').text();
 				var currentEmail = $(this).parent().siblings('.email').text();
@@ -298,7 +293,7 @@ function prepareEditUserTable(){
 				$(this).parent().siblings('.email').children("input").val(currentEmail);
 				
 				$(this).parent().siblings('.accessLevel').empty();
-				$(this).parent().siblings('.accessLevel').append("<input type='number'>");
+				$(this).parent().siblings('.accessLevel').append("<select type='text' id='inputAccessLevel'><option value='1'>1: Clients</option><option value='2'>2: Inspectors</option><option value='3'>3: Costing</option><option value='4'>4: Estimator</option><option value='5'>5: Assistant</option><option value='6'>6: Administrator</option></select>");
 				$(this).parent().siblings('.accessLevel').children("input").val(currentAccessLevel);
 				
 			}
@@ -309,8 +304,9 @@ function prepareEditUserTable(){
 				
 				var currentUsername = $(this).parent().siblings(".username").children("input").val();
 				var currentEmail = $(this).parent().siblings(".email").children("input").val();
-				var currentAccessLevel = $(this).parent().siblings(".accessLevel").children("input").val();
-				
+				var currentAccessLevel = parseInt($(this).parent().siblings(".accessLevel").children("select").val());
+				console.log(typeof currentAccessLevel); //debugging
+                                console.log(currentAccessLevel);
 				if(isNumeric(currentAccessLevel)){
 					$(this).parent().siblings('.username').empty();
 					$(this).parent().siblings('.username').text(currentUsername);
@@ -392,7 +388,7 @@ function submitClient(){
 		"lastName" : lastName,
 		"company" : company,
 		"address" : address,
-		"city" : city,
+		"city" : city
 	};
 	
 	console.log(data);
@@ -417,7 +413,7 @@ function submitClient(){
 function prepareEditClientTable(){
 
 	var data = {
-		"request" : "getClients",
+		"request" : "getClients"
 	};
 	console.log(data);
 	var getClient = $.ajax({url : 'script/server.php', method: 'GET', data : data, dataType:'json'});
@@ -447,7 +443,7 @@ function prepareEditClientTable(){
 		$(".editClientRow").on("click", function(){
 			
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentFirstName = $(this).parent().siblings('.firstName').text();
 				var currentLastName = $(this).parent().siblings('.lastName').text();
@@ -594,7 +590,7 @@ function submitInspector(){
 function prepareEditInspectorTable(){
 	
 	var data = {
-		"request" : "getInspectors",
+		"request" : "getInspectors"
 	};
 	console.log(data);
 	var getInspectors = $.ajax({url : 'script/server.php', method: 'GET', data : data, dataType:'json'});
@@ -623,7 +619,7 @@ function prepareEditInspectorTable(){
 		$(".editInspectorRow").on("click", function(){
 			
 			//entering edit mode
-			if($(this).parent().siblings().children('input').length == 0){
+			if($(this).parent().siblings().children('input').length === 0){
 				$(this).attr("value", "Finish");
 				var currentFirstName = $(this).parent().siblings('.firstName').text();
 				var currentLastName = $(this).parent().siblings('.lastName').text();
