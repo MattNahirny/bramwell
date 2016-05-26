@@ -44,6 +44,17 @@ class GenerateXlsx
         $this->annualPossibleSpecialLeviesRow = 0;
         $this->totalASLContributionsSpecialLeviesRow = 0;
         $this->sceduleALevelOneRows = array();
+        $this->largeTable1To15Start = 0;
+        $this->largeTable16To30Start = 0;
+        $this->smallTable16To30Start = 0;
+        $this->smallTable1To15Start = 0;
+        $this->largeTable1To15End = 0;
+        $this->largeTable16To30End = 0;
+        $this->smallTable16To30End = 0;
+        $this->smallTable1To15End = 0;
+        
+        
+        
         
         //REPORT ARRAY WITH ALL INFO TO GO TO DOCX
         $this->reportValues = array();
@@ -181,6 +192,10 @@ class GenerateXlsx
         //STYLES
         $this->styleBasicInfo();
         $this->styleScheduleA();
+        $this->styleScheduleC1TH();
+        $this->styleScheduleC2FF();
+        $this->styleScheduleC3UN();
+
 
         $this->save();
     }
@@ -296,8 +311,6 @@ class GenerateXlsx
             $this->BasicInfoSheet->mergeCells('A'.$i.':B'.$i);
             $this->BasicInfoSheet->getStyle('C'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
         }
-
-
 
         //NUMBER FORMATS
         $this->BasicInfoSheet->getStyle('C8')->getNumberFormat()->setFormatCode('d-mmm');
@@ -658,6 +671,7 @@ class GenerateXlsx
         self::setupScheduleA();
         $levelone = '';
         $curRow = 3;
+        $count = 1;
         foreach ($this->allTallyData as $index => $array) {
             if ($levelone != $array['l1Name']) {
                 $levelone = $array['l1Name'];
@@ -665,6 +679,7 @@ class GenerateXlsx
                 array_push($this->sceduleALevelOneRows, $curRow);
                 $curRow++;
             } else {
+                $this->SchedASheet->SetCellValue('A' . $curRow, $count);
                 $this->SchedASheet->SetCellValue('B' . $curRow, '=Tally!B' . $curRow);
                 $this->SchedASheet->SetCellValue('C' . $curRow, '=+Tally!C' . $curRow);
                 $this->SchedASheet->SetCellValue('D' . $curRow, '=+Tally!E' . $curRow);
@@ -682,6 +697,7 @@ class GenerateXlsx
                 $this->SchedASheet->SetCellValue('Q' . $curRow, '=IF(H' . $curRow . '="allowance",O' . $curRow . ',)');
                 $this->SchedASheet->SetCellValue('R' . $curRow, '=IF(H' . $curRow . '="allowance",P' . $curRow . ',)');
 
+                $count++;
                 $curRow++;
             }
         }
@@ -733,26 +749,22 @@ class GenerateXlsx
         $this->SchedASheet->SetCellValue('P2', 'RESERVE FUND ANNUAL CONTRIBUTIONS PERCENT ALLOCATION');
         $this->SchedASheet->SetCellValue('Q2', 'INTERNAL USE YEAR 1 ALLOWANCE ANNUAL CONTRIBUTIONS ');
         $this->SchedASheet->SetCellValue('R2', 'INTERNAL USE CURRENT REPLACEMENT ALLOWANCE PERCENTAGE');
-
-        foreach($cellRange as $letter)
-        {
-            $this->SchedASheet->getStyle($letter . '2')->getAlignment()->setWrapText(true);
-        }
     }
 
     function styleScheduleA()
     {
-        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
-        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
-        //$this->dummp($objPHPExcel->getSheet(4)->getStyle('R59')->getNumberFormat()->getFormatCode());
 
         //STYLE ARRAYS
         $allBorders = array(
             'borders' => array(
-                'allborders' => array(
+                'inside' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN,
                     'color' => array( 'rgb' => 'BFBFBF')
-                )
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+
             )
         );
         $a2Style = array(
@@ -841,7 +853,7 @@ class GenerateXlsx
         {
             $this->SchedASheet->getColumnDimension($letter)->setWidth(18);
         }
-        $this->SchedASheet->getRowDimension(1)->setRowHeight(33);
+        $this->SchedASheet->getRowDimension(1)->setRowHeight(0);
         $this->SchedASheet->getRowDimension(2)->setRowHeight(72);
         $this->cellColor($this->SchedASheet, 'A2:R2', 'DCE6F1');
         foreach($this->sceduleALevelOneRows as $row)
@@ -857,7 +869,7 @@ class GenerateXlsx
         $this->SchedASheet->getStyle('P'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('0.00%');
         $this->SchedASheet->getStyle('Q'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('"$"#,##0');
         $this->SchedASheet->getStyle('R'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('0.00%');
-        $this->SchedASheet->getStyle('A1:R'.$this->schedATotalsRow)->applyFromArray($allBorders);
+        $this->SchedASheet->getStyle('A2:R'.$this->schedATotalsRow)->applyFromArray($allBorders);
     }
 
     function getScheduleB()
@@ -1075,9 +1087,16 @@ class GenerateXlsx
         {
             $this->SchedC1THSheet->SetCellValue( $letter . $this->totalASLContributionsSpecialLeviesRow, '=(' . $letter . '15+' . $letter . '16)/\'Basic Info\'!$C$3');
         }
-
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC1THSheet->SetCellValue( $letter . 11, '='.$letter . $this->reserveAdequacyRow);
+        }
+        
+        
+        
+        
         //STYLED LARGE TABLE YEARS 1-15
-        $largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
+        $this->largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
         $cursor = $this->totalASLContributionsSpecialLeviesRow + 2;
         //TOP ROW WITH TITLES
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
@@ -1116,7 +1135,7 @@ class GenerateXlsx
             '',
             'Current Reserve Fund Requirements'
         );
-        for ($i = ($largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
@@ -1126,7 +1145,7 @@ class GenerateXlsx
         );
         $largeTable15YearsRange = range('D', 'R');
 
-        for($i = ($largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -1183,7 +1202,8 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $largeTable16To30Start = ($i + 2);
+            $this->largeTable1To15End = $i;
+            $this->largeTable16To30Start = ($i + 2);
         }
         $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -1197,9 +1217,12 @@ class GenerateXlsx
                 $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
             }
         }
-
+        
+        
+        
+        
         //STYLED LARGE TABLE YEARS 16-30
-        $cursor = $largeTable16To30Start;
+        $cursor = $this->largeTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -1213,12 +1236,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -1261,7 +1284,8 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable1To15Start = ($i + 2);
+            $this->largeTable16To30End = $i;
+            $this->smallTable1To15Start = ($i + 2);
         }
         $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
@@ -1275,8 +1299,11 @@ class GenerateXlsx
             }
         }
 
+        
+        
+        
         //STYLED SMALL TABLE YEARS 1-15
-        $cursor = $smallTable1To15Start;
+        $cursor = $this->smallTable1To15Start;
         //TOP ROW WITH TITLES
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -1293,12 +1320,12 @@ class GenerateXlsx
         }
 
         //Column C
-        for ($i = ($smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 1-15 NONCOMPONENT VALUES
-        for($i = ($smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -1339,7 +1366,8 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable16To30Start = ($i + 2);
+            $this->smallTable1To15End = $i;
+            $this->smallTable16To30Start = ($i + 2);
         }
         $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -1352,8 +1380,12 @@ class GenerateXlsx
                 $this->SchedC1THSheet->SetCellValue( $letter . $i, '=' . $l . ($this->totalExpendituresRow + $j));
             }
         }
+
+        
+        
+        
         //STYLED SMALL TABLE YEARS 16-30
-        $cursor = $smallTable16To30Start;
+        $cursor = $this->smallTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC1THSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC1THSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -1367,12 +1399,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -1413,6 +1445,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC1THSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
+            $this->smallTable16To30End = $i;
         }
         $this->SchedC1THSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
@@ -1425,6 +1458,8 @@ class GenerateXlsx
                 ++$l;
             }
         }
+
+
 
         //CHART SETUP
         $dataSetLabel = array(
@@ -1466,6 +1501,662 @@ class GenerateXlsx
         $chart->setBottomRightPosition('I11');
         $this->SchedC1CTFSheet->addChart($chart);
 
+    }
+
+    function styleScheduleC1TH()
+    {
+                $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+
+        //OUTLINE
+        $this->SchedC1THSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+        $this->SchedC1THSheet->getStyle('A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC1THSheet->getStyle('A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30End)->applyFromArray($allBorders);
+        $this->SchedC1THSheet->getStyle('A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC1THSheet->getStyle('A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30End)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $r = range("I", "Z");
+        foreach(range("A", "I") as $i)
+        {
+            array_push($r, "A".$i);
+        }
+        $this->SchedC1THSheet->getColumnDimension("A")->setWidth(5);
+        $this->SchedC1THSheet->getColumnDimension("B")->setWidth(45);
+        foreach($r as $i)
+        {
+            $this->SchedC1THSheet->getColumnDimension($i)->setWidth(10);
+        }
+        foreach(range('C', 'H') as $i)
+        {
+            $this->SchedC1THSheet->getColumnDimension($i)->setWidth(13);
+        }
+
+        //HEIGHTS
+        foreach(range(1, 10) as $i)
+        {
+            $this->SchedC1THSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC1THSheet->getRowDimension(12)->setRowHeight(60);
+        $this->SchedC1THSheet->getRowDimension($this->largeTable1To15Start)->setRowHeight(20);
+        $this->SchedC1THSheet->getRowDimension($this->largeTable16To30Start)->setRowHeight(20);
+
+        $this->SchedC1THSheet->getRowDimension($this->smallTable1To15Start)->setRowHeight(20);
+        foreach(range(($this->smallTable1To15Start+11), ($this->smallTable1To15Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC1THSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC1THSheet->getRowDimension($this->smallTable16To30Start)->setRowHeight(20);
+        foreach(range(($this->smallTable16To30Start+11), ($this->smallTable16To30Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC1THSheet->getRowDimension($i)->setRowHeight(0);
+        }
+
+        //COLOURING
+        $this->cellColor($this->SchedC1THSheet, 'F15:AI16', 'DAEEF3');
+        $this->cellColor($this->SchedC1THSheet, 'A'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow, 'EBF1DE');
+
+        $this->cellColor($this->SchedC1THSheet, 'A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC1THSheet, 'A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC1THSheet, 'A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC1THSheet, 'A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC1THSheet, 'A'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4), 'DCE6F1');
+
+
+
+        //FONT
+        $this->SchedC1THSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('F12:AI12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A14')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A15:A19')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A21')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A22:B'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C22:D'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('E22:E'.($this->numComponents+22))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.$this->totalExpendituresRow.':E'.$this->reserveAdequacyRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('F14:E'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('A'.$this->largeTable1To15Start.':D'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.$this->largeTable16To30Start.':D'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.$this->smallTable1To15Start.':D'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.$this->smallTable16To30Start.':D'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('R'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('R'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('R'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('R'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable1To15Start+1).':C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable16To30Start+1).':C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable1To15Start+1).':C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable16To30Start+1).':C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15Start+3).':R'.($this->largeTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30Start+3).':R'.($this->largeTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15Start+3).':R'.($this->smallTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30Start+3).':R'.($this->smallTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('A'.($this->largeTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->largeTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->smallTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->smallTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('A'.($this->largeTable1To15End-8).':A'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->largeTable16To30End-8).':A'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->smallTable1To15End-8).':A'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('A'.($this->smallTable16To30End-8).':A'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        //MERGE
+        $this->SchedC1THSheet->mergeCells('C'.($this->largeTable1To15Start+4).':C'.($this->largeTable1To15Start+5));
+        $this->SchedC1THSheet->mergeCells('C'.($this->largeTable16To30Start+4).':C'.($this->largeTable16To30Start+5));
+        $this->SchedC1THSheet->mergeCells('C'.($this->smallTable1To15Start+4).':C'.($this->smallTable1To15Start+5));
+        $this->SchedC1THSheet->mergeCells('C'.($this->smallTable16To30Start+4).':C'.($this->smallTable16To30Start+5));
+
+        $this->SchedC1THSheet->mergeCells('C'.($this->largeTable1To15Start+7).':C'.($this->largeTable1To15Start+9));
+        $this->SchedC1THSheet->mergeCells('C'.($this->largeTable16To30Start+7).':C'.($this->largeTable16To30Start+9));
+        $this->SchedC1THSheet->mergeCells('C'.($this->smallTable1To15Start+7).':C'.($this->smallTable1To15Start+9));
+        $this->SchedC1THSheet->mergeCells('C'.($this->smallTable16To30Start+7).':C'.($this->smallTable16To30Start+9));
+
+        $this->SchedC1THSheet->mergeCells('A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10));
+        $this->SchedC1THSheet->mergeCells('A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10));
+        $this->SchedC1THSheet->mergeCells('A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10));
+        $this->SchedC1THSheet->mergeCells('A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10));
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC1THSheet->getStyle('F11:AI11')->getNumberFormat()->setFormatCode('0%');
+        $this->SchedC1THSheet->getStyle('F14:AI14')->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('E15:AI'.$this->totalASLContributionsSpecialLeviesRow)->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC1THSheet->getStyle('E'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow)->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15Start+4).':R'.($this->largeTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15Start+11).':R'.($this->largeTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15End-3).':R'.($this->largeTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC1THSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30Start+4).':R'.($this->largeTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30Start+11).':R'.($this->largeTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30End-3).':R'.($this->largeTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15Start+4).':R'.($this->smallTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15Start+11).':R'.($this->smallTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15End-3).':R'.($this->smallTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC1THSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30Start+4).':R'.($this->smallTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30Start+11).':R'.($this->smallTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30End-3).':R'.($this->smallTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC1THSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
 
 
     }
@@ -1757,9 +2448,13 @@ class GenerateXlsx
         {
             $this->SchedC2FFSheet->SetCellValue( $letter . $this->totalASLContributionsSpecialLeviesRow, '=(' . $letter . '15+' . $letter . '16)/\'Basic Info\'!$C$3');
         }
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC2FFSheet->SetCellValue( $letter . 11, '='.$letter . $this->reserveAdequacyRow);
+        }
 
         //STYLED LARGE TABLE YEARS 1-15
-        $largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
+        $this->largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
         $cursor = $this->totalASLContributionsSpecialLeviesRow + 2;
         //TOP ROW WITH TITLES
         $this->SchedC2FFSheet->SetCellValue('A' . $cursor, 'Strata:');
@@ -1798,7 +2493,7 @@ class GenerateXlsx
             '',
             'Current Reserve Fund Requirements'
         );
-        for ($i = ($largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
@@ -1808,7 +2503,7 @@ class GenerateXlsx
         );
         $largeTable15YearsRange = range('D', 'R');
 
-        for($i = ($largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -1864,7 +2559,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $largeTable16To30Start = ($i + 2);
+            $this->largeTable16To30Start = ($i + 2);
         }
         $this->SchedC2FFSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -1880,7 +2575,7 @@ class GenerateXlsx
         }
 
         //STYLED LARGE TABLE YEARS 16-30
-        $cursor = $largeTable16To30Start;
+        $cursor = $this->largeTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC2FFSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC2FFSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -1894,12 +2589,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -1942,7 +2637,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable1To15Start = ($i + 2);
+            $this->smallTable1To15Start = ($i + 2);
         }
         $this->SchedC2FFSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
@@ -1957,7 +2652,7 @@ class GenerateXlsx
         }
 
         //STYLED SMALL TABLE YEARS 1-15
-        $cursor = $smallTable1To15Start;
+        $cursor = $this->smallTable1To15Start;
         //TOP ROW WITH TITLES
         $this->SchedC2FFSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC2FFSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -1974,12 +2669,12 @@ class GenerateXlsx
         }
 
         //Column C
-        for ($i = ($smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 1-15 NONCOMPONENT VALUES
-        for($i = ($smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -2020,7 +2715,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable16To30Start = ($i + 2);
+            $this->smallTable16To30Start = ($i + 2);
         }
         $this->SchedC2FFSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -2034,7 +2729,7 @@ class GenerateXlsx
             }
         }
         //STYLED SMALL TABLE YEARS 16-30
-        $cursor = $smallTable16To30Start;
+        $cursor = $this->smallTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC2FFSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC2FFSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -2048,12 +2743,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC2FFSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -2106,6 +2801,664 @@ class GenerateXlsx
                 ++$l;
             }
         }
+    }
+
+    function styleScheduleC2FF()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+
+        //OUTLINE
+        $this->SchedC2FFSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+        $this->SchedC2FFSheet->getStyle('A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC2FFSheet->getStyle('A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30End)->applyFromArray($allBorders);
+        $this->SchedC2FFSheet->getStyle('A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC2FFSheet->getStyle('A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30End)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $r = range("I", "Z");
+        foreach(range("A", "I") as $i)
+        {
+            array_push($r, "A".$i);
+        }
+        $this->SchedC2FFSheet->getColumnDimension("A")->setWidth(5);
+        $this->SchedC2FFSheet->getColumnDimension("B")->setWidth(45);
+        foreach($r as $i)
+        {
+            $this->SchedC2FFSheet->getColumnDimension($i)->setWidth(10);
+        }
+        foreach(range('C', 'H') as $i)
+        {
+            $this->SchedC2FFSheet->getColumnDimension($i)->setWidth(13);
+        }
+
+        //HEIGHTS
+        foreach(range(1, 10) as $i)
+        {
+            $this->SchedC2FFSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC2FFSheet->getRowDimension(12)->setRowHeight(60);
+        $this->SchedC2FFSheet->getRowDimension($this->largeTable1To15Start)->setRowHeight(20);
+        $this->SchedC2FFSheet->getRowDimension($this->largeTable16To30Start)->setRowHeight(20);
+
+        $this->SchedC2FFSheet->getRowDimension($this->smallTable1To15Start)->setRowHeight(20);
+        foreach(range(($this->smallTable1To15Start+11), ($this->smallTable1To15Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC2FFSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC2FFSheet->getRowDimension($this->smallTable16To30Start)->setRowHeight(20);
+        foreach(range(($this->smallTable16To30Start+11), ($this->smallTable16To30Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC2FFSheet->getRowDimension($i)->setRowHeight(0);
+        }
+
+        //COLOURING
+        $this->cellColor($this->SchedC2FFSheet, 'F15:AI16', 'DAEEF3');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow, 'EBF1DE');
+
+        $this->cellColor($this->SchedC2FFSheet, 'A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC2FFSheet, 'A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC2FFSheet, 'A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC2FFSheet, 'A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC2FFSheet, 'A'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4), 'DCE6F1');
+
+
+
+        //FONT
+        $this->SchedC2FFSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('F12:AI12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A14')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A15:A19')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A21')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A22:B'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C22:D'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('E22:E'.($this->numComponents+22))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.$this->totalExpendituresRow.':E'.$this->reserveAdequacyRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('F14:E'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('A'.$this->largeTable1To15Start.':D'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.$this->largeTable16To30Start.':D'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.$this->smallTable1To15Start.':D'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.$this->smallTable16To30Start.':D'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('R'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('R'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('R'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('R'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable1To15Start+1).':C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable16To30Start+1).':C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable1To15Start+1).':C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable16To30Start+1).':C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15Start+3).':R'.($this->largeTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30Start+3).':R'.($this->largeTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15Start+3).':R'.($this->smallTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30Start+3).':R'.($this->smallTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('A'.($this->largeTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->largeTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->smallTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->smallTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('A'.($this->largeTable1To15End-8).':A'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->largeTable16To30End-8).':A'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->smallTable1To15End-8).':A'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('A'.($this->smallTable16To30End-8).':A'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        //MERGE
+        $this->SchedC2FFSheet->mergeCells('C'.($this->largeTable1To15Start+4).':C'.($this->largeTable1To15Start+5));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->largeTable16To30Start+4).':C'.($this->largeTable16To30Start+5));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->smallTable1To15Start+4).':C'.($this->smallTable1To15Start+5));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->smallTable16To30Start+4).':C'.($this->smallTable16To30Start+5));
+
+        $this->SchedC2FFSheet->mergeCells('C'.($this->largeTable1To15Start+7).':C'.($this->largeTable1To15Start+9));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->largeTable16To30Start+7).':C'.($this->largeTable16To30Start+9));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->smallTable1To15Start+7).':C'.($this->smallTable1To15Start+9));
+        $this->SchedC2FFSheet->mergeCells('C'.($this->smallTable16To30Start+7).':C'.($this->smallTable16To30Start+9));
+
+        $this->SchedC2FFSheet->mergeCells('A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10));
+        $this->SchedC2FFSheet->mergeCells('A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10));
+        $this->SchedC2FFSheet->mergeCells('A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10));
+        $this->SchedC2FFSheet->mergeCells('A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10));
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC2FFSheet->getStyle('F11:AI11')->getNumberFormat()->setFormatCode('0%');
+        $this->SchedC2FFSheet->getStyle('F14:AI14')->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('E15:AI'.$this->totalASLContributionsSpecialLeviesRow)->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC2FFSheet->getStyle('E'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow)->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15Start+4).':R'.($this->largeTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15Start+11).':R'.($this->largeTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15End-3).':R'.($this->largeTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30Start+4).':R'.($this->largeTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30Start+11).':R'.($this->largeTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30End-3).':R'.($this->largeTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15Start+4).':R'.($this->smallTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15Start+11).':R'.($this->smallTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15End-3).':R'.($this->smallTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC2FFSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30Start+4).':R'.($this->smallTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30Start+11).':R'.($this->smallTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30End-3).':R'.($this->smallTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC2FFSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
+
+
     }
 
     function getScheduleC2CFT()
@@ -2392,9 +3745,13 @@ class GenerateXlsx
         {
             $this->SchedC3UNSheet->SetCellValue( $letter . $this->totalASLContributionsSpecialLeviesRow, '=(' . $letter . '15+' . $letter . '16)/\'Basic Info\'!$C$3');
         }
+        foreach ($cellRange3 as $letter)
+        {
+            $this->SchedC3UNSheet->SetCellValue( $letter . 11, '='.$letter . $this->reserveAdequacyRow);
+        }
 
         //STYLED LARGE TABLE YEARS 1-15
-        $largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
+        $this->largeTable1To15Start = $this->totalASLContributionsSpecialLeviesRow + 2;
         $cursor = $this->totalASLContributionsSpecialLeviesRow + 2;
         //TOP ROW WITH TITLES
         $this->SchedC3UNSheet->SetCellValue('A' . $cursor, 'Strata:');
@@ -2433,7 +3790,7 @@ class GenerateXlsx
             '',
             'Current Reserve Fund Requirements'
         );
-        for ($i = ($largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
@@ -2443,7 +3800,7 @@ class GenerateXlsx
         );
         $largeTable15YearsRange = range('D', 'R');
 
-        for($i = ($largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -2499,7 +3856,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $largeTable16To30Start = ($i + 2);
+            $this->largeTable16To30Start = ($i + 2);
         }
         $this->SchedC3UNSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -2515,7 +3872,7 @@ class GenerateXlsx
         }
 
         //STYLED LARGE TABLE YEARS 16-30
-        $cursor = $largeTable16To30Start;
+        $cursor = $this->largeTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC3UNSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC3UNSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -2529,12 +3886,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->largeTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->largeTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -2577,7 +3934,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable1To15Start = ($i + 2);
+            $this->smallTable1To15Start = ($i + 2);
         }
         $this->SchedC3UNSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 16-30 FILL ALL AFTER COMPONENTS SECTION
@@ -2592,7 +3949,7 @@ class GenerateXlsx
         }
 
         //STYLED SMALL TABLE YEARS 1-15
-        $cursor = $smallTable1To15Start;
+        $cursor = $this->smallTable1To15Start;
         //TOP ROW WITH TITLES
         $this->SchedC3UNSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC3UNSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -2609,12 +3966,12 @@ class GenerateXlsx
         }
 
         //Column C
-        for ($i = ($smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable1To15Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 1-15 NONCOMPONENT VALUES
-        for($i = ($smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable1To15Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             foreach($largeTable15YearsRange as $letter)
             {
@@ -2655,7 +4012,7 @@ class GenerateXlsx
         for($i = $afterComponents, $j = 0; $j < 9; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue( 'A' . $i, $afterComponentsArray[$j]);
-            $smallTable16To30Start = ($i + 2);
+            $this->smallTable16To30Start = ($i + 2);
         }
         $this->SchedC3UNSheet->SetCellValue( 'C' . $afterComponents, '=SUM(C' . $componentsRowStart . ':' . 'C' . ($afterComponents-1) . ')');
         //YEARS 1-15 FILL ALL AFTER COMPONENTS SECTION
@@ -2669,7 +4026,7 @@ class GenerateXlsx
             }
         }
         //STYLED SMALL TABLE YEARS 16-30
-        $cursor = $smallTable16To30Start;
+        $cursor = $this->smallTable16To30Start;
         //TOP ROW WITH TITLES
         $this->SchedC3UNSheet->SetCellValue('A' . $cursor, 'Strata:');
         $this->SchedC3UNSheet->SetCellValue('C' . $cursor, '=\'Basic Info\'!$C$2');
@@ -2683,12 +4040,12 @@ class GenerateXlsx
             $componentsRowStart = ($i+1);
         }
 
-        for ($i = ($smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
+        for ($i = ($this->smallTable16To30Start + 1), $j = 0; $j < 7; $i++, $j++)
         {
             $this->SchedC3UNSheet->SetCellValue('C' . $i, $columnC[$j]);
         }
         //YEARS 16-30 NONCOMPONENT VALUES
-        for($i = ($smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
+        for($i = ($this->smallTable16To30Start+3), $j = 0; $j < 7; $i++, $j++)
         {
             $l = 'U';
             foreach($largeTable15YearsRange as $letter)
@@ -2741,6 +4098,663 @@ class GenerateXlsx
                 ++$l;
             }
         }
+    }
+
+    function styleScheduleC3UN()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+
+        //OUTLINE
+        $this->SchedC3UNSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+        $this->SchedC3UNSheet->getStyle('A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC3UNSheet->getStyle('A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30End)->applyFromArray($allBorders);
+        $this->SchedC3UNSheet->getStyle('A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15End)->applyFromArray($allBorders);
+        $this->SchedC3UNSheet->getStyle('A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30End)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $r = range("I", "Z");
+        foreach(range("A", "I") as $i)
+        {
+            array_push($r, "A".$i);
+        }
+        $this->SchedC3UNSheet->getColumnDimension("A")->setWidth(5);
+        $this->SchedC3UNSheet->getColumnDimension("B")->setWidth(45);
+        foreach($r as $i)
+        {
+            $this->SchedC3UNSheet->getColumnDimension($i)->setWidth(10);
+        }
+        foreach(range('C', 'H') as $i)
+        {
+            $this->SchedC3UNSheet->getColumnDimension($i)->setWidth(13);
+        }
+
+        //HEIGHTS
+        foreach(range(1, 10) as $i)
+        {
+            $this->SchedC3UNSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC3UNSheet->getRowDimension(12)->setRowHeight(60);
+        $this->SchedC3UNSheet->getRowDimension($this->largeTable1To15Start)->setRowHeight(20);
+        $this->SchedC3UNSheet->getRowDimension($this->largeTable16To30Start)->setRowHeight(20);
+
+        $this->SchedC3UNSheet->getRowDimension($this->smallTable1To15Start)->setRowHeight(20);
+        foreach(range(($this->smallTable1To15Start+11), ($this->smallTable1To15Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC3UNSheet->getRowDimension($i)->setRowHeight(0);
+        }
+        $this->SchedC3UNSheet->getRowDimension($this->smallTable16To30Start)->setRowHeight(20);
+        foreach(range(($this->smallTable16To30Start+11), ($this->smallTable16To30Start+$this->numComponents+10)) as $i)
+        {
+            $this->SchedC3UNSheet->getRowDimension($i)->setRowHeight(0);
+        }
+
+        //COLOURING
+        $this->cellColor($this->SchedC3UNSheet, 'F15:AI16', 'DAEEF3');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow, 'EBF1DE');
+
+        $this->cellColor($this->SchedC3UNSheet, 'A'.$this->largeTable1To15Start.':R'.$this->largeTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC3UNSheet, 'A'.$this->largeTable16To30Start.':R'.$this->largeTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC3UNSheet, 'A'.$this->smallTable1To15Start.':R'.$this->smallTable1To15Start, 'DCE6F1');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4), 'DCE6F1');
+
+        $this->cellColor($this->SchedC3UNSheet, 'A'.$this->smallTable16To30Start.':R'.$this->smallTable16To30Start, 'DCE6F1');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-8), 'EBF1DE');
+        $this->cellColor($this->SchedC3UNSheet, 'A'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4), 'DCE6F1');
+
+
+
+        //FONT
+        $this->SchedC3UNSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('F12:AI12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A14')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A15:A19')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A21')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A22:B'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C22:D'.($this->numComponents+21))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('E22:E'.($this->numComponents+22))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.$this->totalExpendituresRow.':E'.$this->reserveAdequacyRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('F14:E'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('A'.$this->largeTable1To15Start.':D'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.$this->largeTable16To30Start.':D'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.$this->smallTable1To15Start.':D'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.$this->smallTable16To30Start.':D'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 14,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('R'.$this->largeTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('R'.$this->largeTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('R'.$this->smallTable1To15Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('R'.$this->smallTable16To30Start)->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 10
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable1To15Start+1).':C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable16To30Start+1).':C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable1To15Start+1).':C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable16To30Start+1).':C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable1To15Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable16To30Start+4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15Start+3).':R'.($this->largeTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30Start+3).':R'.($this->largeTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15Start+3).':R'.($this->smallTable1To15Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30Start+3).':R'.($this->smallTable16To30Start+3))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable1To15Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable16To30Start+7))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('A'.($this->largeTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->largeTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->smallTable1To15Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->smallTable16To30Start+10))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('A'.($this->largeTable1To15End-8).':A'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->largeTable16To30End-8).':A'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->smallTable1To15End-8).':A'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('A'.($this->smallTable16To30End-8).':A'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+11+$this->numComponents))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+
+        //MERGE
+        $this->SchedC3UNSheet->mergeCells('C'.($this->largeTable1To15Start+4).':C'.($this->largeTable1To15Start+5));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->largeTable16To30Start+4).':C'.($this->largeTable16To30Start+5));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->smallTable1To15Start+4).':C'.($this->smallTable1To15Start+5));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->smallTable16To30Start+4).':C'.($this->smallTable16To30Start+5));
+
+        $this->SchedC3UNSheet->mergeCells('C'.($this->largeTable1To15Start+7).':C'.($this->largeTable1To15Start+9));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->largeTable16To30Start+7).':C'.($this->largeTable16To30Start+9));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->smallTable1To15Start+7).':C'.($this->smallTable1To15Start+9));
+        $this->SchedC3UNSheet->mergeCells('C'.($this->smallTable16To30Start+7).':C'.($this->smallTable16To30Start+9));
+
+        $this->SchedC3UNSheet->mergeCells('A'.($this->largeTable1To15Start+10).':R'.($this->largeTable1To15Start+10));
+        $this->SchedC3UNSheet->mergeCells('A'.($this->largeTable16To30Start+10).':R'.($this->largeTable16To30Start+10));
+        $this->SchedC3UNSheet->mergeCells('A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10));
+        $this->SchedC3UNSheet->mergeCells('A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10));
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC3UNSheet->getStyle('F11:AI11')->getNumberFormat()->setFormatCode('0%');
+        $this->SchedC3UNSheet->getStyle('F14:AI14')->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('E15:AI'.$this->totalASLContributionsSpecialLeviesRow)->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC3UNSheet->getStyle('E'.$this->reserveAdequacyRow.':AI'.$this->reserveAdequacyRow)->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable1To15Start+11).':C'.($this->largeTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15Start+4).':R'.($this->largeTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15Start+11).':R'.($this->largeTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15End-8).':R'.($this->largeTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15End-3).':R'.($this->largeTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable1To15End-4).':R'.($this->largeTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->largeTable16To30Start+11).':C'.($this->largeTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30Start+4).':R'.($this->largeTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30Start+11).':R'.($this->largeTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30End-8).':R'.($this->largeTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30End-3).':R'.($this->largeTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->largeTable16To30End-4).':R'.($this->largeTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable1To15Start+11).':C'.($this->smallTable1To15Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15Start+4).':R'.($this->smallTable1To15Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15Start+11).':R'.($this->smallTable1To15Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15End-8).':R'.($this->smallTable1To15End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15End-3).':R'.($this->smallTable1To15End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable1To15End-4).':R'.($this->smallTable1To15End-4))->getNumberFormat()->setFormatCode('0%');
+
+        $this->SchedC3UNSheet->getStyle('C'.($this->smallTable16To30Start+11).':C'.($this->smallTable16To30Start+10+$this->numComponents))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30Start+4).':R'.($this->smallTable16To30Start+9))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30Start+11).':R'.($this->smallTable16To30Start+11+$this->numComponents))->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30End-8).':R'.($this->smallTable16To30End-5))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30End-3).':R'.($this->smallTable16To30End))->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
+        $this->SchedC3UNSheet->getStyle('D'.($this->smallTable16To30End-4).':R'.($this->smallTable16To30End-4))->getNumberFormat()->setFormatCode('0%');
+
     }
 
     function getScheduleC3CFT()
