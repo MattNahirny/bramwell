@@ -43,6 +43,7 @@ class GenerateXlsx
         $this->annualASLContributionsRow = 0;
         $this->annualPossibleSpecialLeviesRow = 0;
         $this->totalASLContributionsSpecialLeviesRow = 0;
+        $this->sceduleALevelOneRows = array();
         
         //REPORT ARRAY WITH ALL INFO TO GO TO DOCX
         $this->reportValues = array();
@@ -179,6 +180,7 @@ class GenerateXlsx
         $this->getComparison();
         //STYLES
         $this->styleBasicInfo();
+        $this->styleScheduleA();
 
         $this->save();
     }
@@ -294,6 +296,17 @@ class GenerateXlsx
             $this->BasicInfoSheet->mergeCells('A'.$i.':B'.$i);
             $this->BasicInfoSheet->getStyle('C'.$i)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
         }
+
+
+
+        //NUMBER FORMATS
+        $this->BasicInfoSheet->getStyle('C8')->getNumberFormat()->setFormatCode('d-mmm');
+        $this->BasicInfoSheet->getStyle('C9')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->BasicInfoSheet->getStyle('C13')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->BasicInfoSheet->getStyle('C17')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->BasicInfoSheet->getStyle('C10:C12')->getNumberFormat()->setFormatCode('0.00%');
+        $this->BasicInfoSheet->getStyle('C14:C16')->getNumberFormat()->setFormatCode('0.00%');
+
     }
 
     function setupBasicInfo()
@@ -309,7 +322,7 @@ class GenerateXlsx
             'Threshold Year 1 Proposed Annual RF Contributions Increase:',
             'C.1 and C.2 Year 1 Proposed Contributions Increase Rate:',
             'C.3 Year 1 Proposed Contributions Increase Rate:',
-            'C1 and C.2 Year 1 Proposed RF Contributions Amount:',
+            'C.1 and C.2 Year 1 Proposed RF Contributions Amount:',
             'Construction Inflation rate:',
             'Strata Corporation Sched. B Average Interest Rate:',
             'Investment Interest Rate:',
@@ -649,6 +662,7 @@ class GenerateXlsx
             if ($levelone != $array['l1Name']) {
                 $levelone = $array['l1Name'];
                 $this->SchedASheet->SetCellValue('A' . $curRow, $levelone);
+                array_push($this->sceduleALevelOneRows, $curRow);
                 $curRow++;
             } else {
                 $this->SchedASheet->SetCellValue('B' . $curRow, '=Tally!B' . $curRow);
@@ -665,12 +679,11 @@ class GenerateXlsx
                 $this->SchedASheet->SetCellValue('M' . $curRow, '=+Tally!AD' . $curRow);
                 $this->SchedASheet->SetCellValue('N' . $curRow, '=+Tally!AE' . $curRow);
                 $this->SchedASheet->SetCellValue('O' . $curRow, '=+Tally!AF' . $curRow);
-                $this->SchedASheet->SetCellValue('Q' . $curRow, '=IF(H' . $curRow . '="allowance",N' . $curRow . ',)');
-                $this->SchedASheet->SetCellValue('R' . $curRow, '=IF(H' . $curRow . '="allowance",O' . $curRow . ',)');
+                $this->SchedASheet->SetCellValue('Q' . $curRow, '=IF(H' . $curRow . '="allowance",O' . $curRow . ',)');
+                $this->SchedASheet->SetCellValue('R' . $curRow, '=IF(H' . $curRow . '="allowance",P' . $curRow . ',)');
 
                 $curRow++;
             }
-            $this->TallySheet->calculateColumnWidths();
         }
         $this->schedATotalsRow = $curRow;
         $this->SchedASheet->SetCellValue('A' . $curRow, 'TOTAL RESERVES');
@@ -725,6 +738,126 @@ class GenerateXlsx
         {
             $this->SchedASheet->getStyle($letter . '2')->getAlignment()->setWrapText(true);
         }
+    }
+
+    function styleScheduleA()
+    {
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(4)->getStyle('R59')->getNumberFormat()->getFormatCode());
+
+        //STYLE ARRAYS
+        $allBorders = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                )
+            )
+        );
+        $a2Style = array(
+            'font' => array(
+                'bold' => true,
+                'size'  => 18,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            )
+        );
+        $ctoR2Style = array(
+            'font' => array(
+                'bold' => true,
+                'size'  => 11,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true
+            )
+        );
+        $l1Style = array(
+            'font' => array(
+                'bold' => true,
+                'size'  => 12,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
+            )
+        );
+        $compACDEFStyle = array(
+            'font' => array(
+                'size'  => 11,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+            )
+        );
+        $compBStyle = array(
+            'font' => array(
+                'size'  => 11,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
+            )
+        );
+        $compGtoRStyle = array(
+            'font' => array(
+                'size'  => 11,
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
+            )
+        );
+
+        $this->SchedASheet->getRowDimension(1)->setRowHeight(1);
+        for($i = 4; $i < $this->schedATotalsRow; $i++)
+        {
+            $this->SchedASheet->getStyle('A'.$i)->applyFromArray($compACDEFStyle);
+            $this->SchedASheet->getStyle('B'.$i)->applyFromArray($compBStyle);
+            $this->SchedASheet->getStyle('C'.$i)->applyFromArray($compACDEFStyle);
+            $this->SchedASheet->getStyle('D'.$i)->applyFromArray($compACDEFStyle);
+            $this->SchedASheet->getStyle('E'.$i)->applyFromArray($compACDEFStyle);
+            $this->SchedASheet->getStyle('F'.$i)->applyFromArray($compACDEFStyle);
+            $this->SchedASheet->getStyle('G'.$i.':R'.$i)->applyFromArray($compGtoRStyle);
+
+            $this->SchedASheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('_(* #,##0_);_(* \\\\(#,##0\\\\);_(* "-"??_);_(@_)');
+            $this->SchedASheet->getStyle('I'.$i)->getNumberFormat()->setFormatCode('_(* #,##0_);_(* \\\\(#,##0\\\\);_(* "-"??_);_(@_)');
+            $this->SchedASheet->getStyle('J'.$i.':O'.$i)->getNumberFormat()->setFormatCode('"$"#,##0');
+            $this->SchedASheet->getStyle('P'.$i)->getNumberFormat()->setFormatCode('0.00%');
+            $this->SchedASheet->getStyle('Q'.$i)->getNumberFormat()->setFormatCode('"$"#,##0');
+            $this->SchedASheet->getStyle('R'.$i)->getNumberFormat()->setFormatCode('0.00%');
+
+            $this->SchedASheet->getRowDimension($i)->setRowHeight(17);
+        }
+        $this->SchedASheet->mergeCells('A2:B2');
+        $this->SchedASheet->getColumnDimension("A")->setWidth(5);
+        $this->SchedASheet->getColumnDimension("B")->setWidth(45);
+
+        $this->SchedASheet->getStyle('A2')->applyFromArray($a2Style);
+        $this->SchedASheet->getStyle('C2:R2')->applyFromArray($ctoR2Style);
+
+        foreach(range("C", "R") as $letter)
+        {
+            $this->SchedASheet->getColumnDimension($letter)->setWidth(18);
+        }
+        $this->SchedASheet->getRowDimension(1)->setRowHeight(33);
+        $this->SchedASheet->getRowDimension(2)->setRowHeight(72);
+        $this->cellColor($this->SchedASheet, 'A2:R2', 'DCE6F1');
+        foreach($this->sceduleALevelOneRows as $row)
+        {
+            $this->SchedASheet->getRowDimension($row)->setRowHeight(20);
+            $this->SchedASheet->getStyle('A'.$row)->applyFromArray($l1Style);
+            $this->cellColor($this->SchedASheet, 'A'.$row.':R'.$row, 'EBF1DE');
+            $this->SchedASheet->mergeCells('A'.$row.':B'.$row);
+        }
+        $this->cellColor($this->SchedASheet, 'A'.$this->schedATotalsRow.':R'.$this->schedATotalsRow, 'DCE6F1');
+        $this->SchedASheet->mergeCells('A'.$this->schedATotalsRow.':B'.$this->schedATotalsRow);
+        $this->SchedASheet->getStyle('J'.$this->schedATotalsRow.':O'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedASheet->getStyle('P'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('0.00%');
+        $this->SchedASheet->getStyle('Q'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedASheet->getStyle('R'.$this->schedATotalsRow)->getNumberFormat()->setFormatCode('0.00%');
+        $this->SchedASheet->getStyle('A1:R'.$this->schedATotalsRow)->applyFromArray($allBorders);
     }
 
     function getScheduleB()
