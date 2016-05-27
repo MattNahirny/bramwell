@@ -16,8 +16,8 @@ ini_set("display_errors", 1 );
 
 include_once('GenerateXlsx.php');
 
-
-$excelmaker = new GenerateXlsx($conn, 1);
+$id = $_REQUEST['id'];
+$excelmaker = new GenerateXlsx($conn, $id);
 $excelmaker->run();
 
 

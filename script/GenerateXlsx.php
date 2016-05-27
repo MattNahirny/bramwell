@@ -18,8 +18,8 @@ class GenerateXlsx
         $this->numComponents = 0;
         $this->allComponents = array();
         //QUERIES TO DB
-        $this->basicInfoQuery = '';
-        $this->tallyQuery = 'SELECT levelone.Name AS "l1Name", levelfour.Name AS "l4Name", plancomponent.YearAcquired, levelfour.ExpectedLifespan, plancomponent.NumUnits, plancomponent.UnitOfMeasure, levelfour.Cost
+        $this->basicInfoQuery = 'SELECT * FROM `basicinfo` Where PlanId = :planID';
+        /*$this->tallyQuery = 'SELECT levelone.Name AS "l1Name", levelfour.Name AS "l4Name", plancomponent.YearAcquired, levelfour.ExpectedLifespan, plancomponent.NumUnits, plancomponent.UnitOfMeasure, levelfour.Cost
                                 FROM plan
                                 INNER JOIN plancomponent
                                 ON plan.PlanId = plancomponent.PlanId
@@ -31,7 +31,7 @@ class GenerateXlsx
                                 ON levelthree.LevelTwoId = leveltwo.LevelTwoId
 	                            INNER JOIN levelone
                                 ON leveltwo.LevelOneId = levelone.LevelOneId
-                                WHERE plan.PlanId = :planID';
+                                WHERE plan.PlanId = :planID';*/
         //ROWS OF IMPORTANT DATA CELLS
         $this->schedATotalsRow = 0;
         $this->totalExpendituresRow = 0;
@@ -52,96 +52,48 @@ class GenerateXlsx
         $this->largeTable16To30End = 0;
         $this->smallTable16To30End = 0;
         $this->smallTable1To15End = 0;
-        
-        
-        
-        
+
         //REPORT ARRAY WITH ALL INFO TO GO TO DOCX
         $this->reportValues = array();
+        //REPORT VALUES THAT MUST BE PASSED TO DOCX
+        //$this->reportValues['AnnualReserveFundContributions'][0];
+        //$this->reportValues['AnnualReserveFundContributions'][1];
+        //$this->reportValues['AnnualReserveFundContributions'][2];
+        //$this->reportValues['Year1ReserveAdequacy'];
+        //$this->reportValues['Year30ReserveAdequacy'];
+        //$this->reportValues['CurrentReplacementCost'];
+        //$this->reportValues['FutureReplacementCost'];
+        //$this->reportValues['CurrentReserveFundCostReq'];
+        //$this->reportValues['FutureReserveFundAcc'];
+        //$this->reportValues['FutureReserveFundReq'];
+        //$this->reportValues['ReserveFundAnnualCon'];
+        //$this->reportValues['ReserveFundClosingBalance'][0];
+        //$this->reportValues['RecommendedAnnualRFContr'];
+        //$this->reportValues['ReserveAdequacy'];
+        //$this->reportValues['MonthlyASLContributions'][0];
+        //$this->reportValues['MonthlyASLContributions'][1];
+        //$this->reportValues['MonthlyASLContributions'][2];
+        //$this->reportValues['OpeningBalanceDate'];
+        //$this->reportValues['OpeningBalanceValue'];
+        //$this->reportValues['CurrentBudgetedAnnualRFC'];
+        //$this->reportValues['AuthorizedSpecialLeveies'];
+        //$this->reportValues['Borrowings'];
+        //$this->reportValues['LoanRefinance'];
+        //$this->reportValues['ReserveFundTaxFreeAnnualIntIncome'];
+        //$this->reportValues['LessRepaymentOfFinancingLoan'];
+        //$this->reportValues['LessReserveFundBudgetCurrentFYear'];
+        //$this->reportValues['ProjectedReserveFundBalanceDate'];
+        //$this->reportValues['ProjectedReserveFundBalanceValue'];
+        //$this->reportValues['EstimatedReserveFund_Shortfall'];
+        //$this->reportValues['BudgetTransferFromDate'];
+        //$this->reportValues['BudgetTransferFromValue'];
+        //$this->reportValues['ProposedSpecialLeveiesDate'];
+        //$this->reportValues['ProposedSpecialLeveiesValue'];
+        //$this->reportValues['EstimatedReserveFundAdequacy'];
+        //$this->reportValues['EstimatedReserveFundDeficiency'];
+        //$this->reportValues['ReserveAdequacyDate'];
+        //$this->reportValues['ReserveAdequacyValue'];
 
-        // sched c1 th,   F15
-        $this->reportValues['AnnualReserveFundContributions'][0] = array('year'=>2014, 'value'=>2400);
-        // sched c1 th,   G15
-        $this->reportValues['AnnualReserveFundContributions'][1] = array('year'=>2015, 'value'=>2640);
-        // sched c1 th,   L19
-        $this->reportValues['AnnualReserveFundContributions'][2] = array('year'=>2020, 'value'=>51961);
-//pg 6
-        // i think it on the loop to get the compoenents.. u have a cout for it if iremember.
-        $this->reportValues['ReserveFundGroups'][0] = array('name'=>'Site Improvements Reserve Components', 'total'=>10);
-        // can be any number of level1 total, name. COUNT for each level1 id
-        $this->reportValues['ReserveFundGroups'][1] = array('name'=>'Consultant Report', 'total'=>1);
-        // basic info,    C17
-        $this->reportValues['Year1ReserveAdequacy']        = "37";
-        // basic info,    C18
-        $this->reportValues['Year30ReserveAdequacy']       = "60";
-        // sched A,    J16
-        $this->reportValues['CurrentReplacementCost']      = "162713";
-        // sched A,    K16
-        $this->reportValues['FutureReplacementCost']       = "501654";
-        // sched A,    L16
-        $this->reportValues['CurrentReserveFundCostReq']   = "63643";
-        // sched A,    M16
-        $this->reportValues['FutureReserveFundAcc']        = "95298";
-        // sched A,    N16
-        $this->reportValues['FutureReserveFundReq']        = "406356";
-        // sched A,    O16
-        $this->reportValues['ReserveFundAnnualCon']        = "10218";
-//pg 16
-        // sched c1 th,     F15
-        $this->reportValues['ReserveFundClosingBalance'][0] = array('date'=>'2013-12-31', 'value'=>22027);
-        // sched C1 CFT,    C4
-        $this->reportValues['RecommendedAnnualRFContr'] = "1500";
-        // sched C1 CFT,    F41
-        $this->reportValues['ReserveAdequacy'] = "37";
-        // ? C1 TH
-        $this->reportValues['MonthlyASLContributions'][0] = array('year'=>'2014', 'value'=>20.00);
-        // ?
-        $this->reportValues['MonthlyASLContributions'][1] = array('year'=>'2019', 'value'=>32.21);
-//pg65
-        // ?
-        $this->reportValues['MonthlyASLContributions'][2] = array('year'=>'2015', 'value'=>22.00);
-//pg 60
-
-        $this->reportValues['OpeningBalanceDate'] = "2014-01-01";
-
-        $this->reportValues['OpeningBalanceValue'] = "22027";
-
-        $this->reportValues['CurrentBudgetedAnnualRFC'] = "2400";
-
-        $this->reportValues['AuthorizedSpecialLeveies'] = "0";
-
-        $this->reportValues['Borrowings'] = "0";
-
-        $this->reportValues['LoanRefinance'] = "0";
-
-        $this->reportValues['ReserveFundTaxFreeAnnualIntIncome'] = "330";
-
-        $this->reportValues['LessRepaymentOfFinancingLoan'] = "0";
-
-        $this->reportValues['LessReserveFundBudgetCurrentFYear'] = "-1575";
-
-        $this->reportValues['ProjectedReserveFundBalanceDate'] = "2014-12-31";
-
-        $this->reportValues['ProjectedReserveFundBalanceValue'] = "23182";
-
-        $this->reportValues['EstimatedReserveFund_Shortfall'] = "62068";
-
-        $this->reportValues['BudgetTransferFromDate'] = "2015-01-01";
-
-        $this->reportValues['BudgetTransferFromValue'] = "6000";
-
-        $this->reportValues['ProposedSpecialLeveiesDate'] = "2015-01-01";
-
-        $this->reportValues['ProposedSpecialLeveiesValue'] = "33468";
-
-        $this->reportValues['EstimatedReserveFundAdequacy'] = "100";
-//pg62
-
-        $this->reportValues['EstimatedReserveFundDeficiency'] = "38885";
-
-        $this->reportValues['ReserveAdequacyDate'] = "2014-12-31";
-
-        $this->reportValues['ReserveAdequacyValue'] = "37";
 
         $this->BasicInfoSheet = $this->PHPExcel->createSheet();
         $this->TallySheet = $this->PHPExcel->createSheet();
@@ -155,6 +107,38 @@ class GenerateXlsx
         $this->SchedC2CFTSheet = $this->PHPExcel->createSheet();
         $this->SchedC3UNSheet = $this->PHPExcel->createSheet();
         $this->SchedC3CFTSheet = $this->PHPExcel->createSheet();
+    }
+    function getBasicInfoFromDB($conn, $planId)
+    {
+        $data = $this->conn->prepare($this->BasicInfoQuery);
+        $data->bindParam(':planID', $planId, PDO::PARAM_INT, 11);
+        $data->execute();
+        $dataRows = array();
+        $r = $data->fetch(PDO::FETCH_ASSOC);
+
+        $r['strata'] = 'Strata ID';
+        $r['numLots'] = 20;
+        $r['entUnits'] = 0;
+        $r['amenities'] = 0;
+        $r['yearAcquired'] = 1970;
+        $r['currentYear'] = 2016;
+        $r['fiscalYearEnd'] = '28-feb';
+        $r['THCurApprovedIncrease'] = 5000;
+        $r['THYr1PropIncrease'] = 0;
+        $r['C1C2proposedContribution'] = 0.05;
+        $r['C3proposedContribution'] = '1%';
+        $r['C1C2PropRFConrtibution'] = 0;
+        $r['constructionInflation'] = '3%';
+        $r['SchedBInterestRate'] = 0;
+        $r['invenstmentInterest'] = '1%';
+        $r['operatingBudget'] = '12345';
+
+        $this->dataRows = $r;
+        $this->dummp($this->dataRows);
+    }
+    function getTallyInfoFromDB($conn, $planId)
+    {
+        
     }
 
     function dummp($data) {
@@ -172,6 +156,8 @@ class GenerateXlsx
 
     function getReportValues()
     {
+
+
         return $this->reportValues;
     }
 
@@ -195,7 +181,9 @@ class GenerateXlsx
         $this->styleScheduleC1TH();
         $this->styleScheduleC2FF();
         $this->styleScheduleC3UN();
-
+        $this->styleScheduleC1CTF();
+        $this->styleScheduleC2CTF();
+        $this->styleScheduleC3CTF();
 
         $this->save();
     }
@@ -221,49 +209,23 @@ class GenerateXlsx
     function getBasicInfo()
     {
         self::setupBasicInfo();
-        //$data = $this->conn->prepare($this->BasicInfoQuery);
-        //$data->bindParam(':planID', $this->planID, PDO::PARAM_INT, 11);
-        //$data->execute();
-        //$dataRows = array();
-        //while($r = $data->fetch(PDO::FETCH_ASSOC))
-        //{
-            $r['strata'] = 'Strata ID';
-            $r['numLots'] = 20;
-            $r['entUnits'] = 0;
-            $r['amenities'] = 0;
-            $r['yearAcquired'] = 1970;
-            $r['currentYear'] = date('Y');
-            $r['fiscalYearEnd'] = '28-feb';
-            $r['THCurApprovedIncrease'] = 0;
-            $r['THYr1PropIncrease'] = 0;
-            $r['C1C2proposedContribution'] = '5%';
-            $r['C3proposedContribution'] = '1%';
-            $r['C1C2PropRFConrtibution'] = 0;
-            $r['constructionInflation'] = '3%';
-            $r['SchedBInterestRate'] = 0;
-            $r['invenstmentInterest'] = '1%';
-            $r['operatingBudget'] = '12345';
-
-            $dataRows = $r;
-            //$this->dummp($dataRows);
-            //}
-
-        $this->BasicInfoSheet->SetCellValue('C2', $dataRows['strata']);
-        $this->BasicInfoSheet->SetCellValue('C3', $dataRows['numLots']);
-        $this->BasicInfoSheet->SetCellValue('C4', $dataRows['entUnits']);
-        $this->BasicInfoSheet->SetCellValue('C5', $dataRows['amenities']);
-        $this->BasicInfoSheet->SetCellValue('C6', $dataRows['yearAcquired']);
-        $this->BasicInfoSheet->SetCellValue('C7', $dataRows['currentYear']);
-        $this->BasicInfoSheet->SetCellValue('C8', $dataRows['fiscalYearEnd']);
-        $this->BasicInfoSheet->SetCellValue('C9', $dataRows['THCurApprovedIncrease']);
-        $this->BasicInfoSheet->SetCellValue('C10', $dataRows['THYr1PropIncrease']);
-        $this->BasicInfoSheet->SetCellValue('C11', $dataRows['C1C2proposedContribution']);
-        $this->BasicInfoSheet->SetCellValue('C12', $dataRows['C3proposedContribution']);
-        $this->BasicInfoSheet->SetCellValue('C13', $dataRows['C1C2PropRFConrtibution']);
-        $this->BasicInfoSheet->SetCellValue('C14', $dataRows['constructionInflation']);
-        $this->BasicInfoSheet->SetCellValue('C15', $dataRows['SchedBInterestRate']);
-        $this->BasicInfoSheet->SetCellValue('C16', $dataRows['invenstmentInterest']);
-        $this->BasicInfoSheet->SetCellValue('C17', $dataRows['operatingBudget']);
+        $this->getBasicInfoFromDB($this->conn, $this->planID);
+        $this->BasicInfoSheet->SetCellValue('C2', $this->dataRows['strata']);
+        $this->BasicInfoSheet->SetCellValue('C3', $this->dataRows['numLots']);
+        $this->BasicInfoSheet->SetCellValue('C4', $this->dataRows['entUnits']);
+        $this->BasicInfoSheet->SetCellValue('C5', $this->dataRows['amenities']);
+        $this->BasicInfoSheet->SetCellValue('C6', $this->dataRows['yearAcquired']);
+        $this->BasicInfoSheet->SetCellValue('C7', $this->dataRows['currentYear']);
+        $this->BasicInfoSheet->SetCellValue('C8', $this->dataRows['fiscalYearEnd']);
+        $this->BasicInfoSheet->SetCellValue('C9', $this->dataRows['THCurApprovedIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C10', $this->dataRows['THYr1PropIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C11', $this->dataRows['C1C2proposedContribution']);
+        $this->BasicInfoSheet->SetCellValue('C12', $this->dataRows['C3proposedContribution']);
+        $this->BasicInfoSheet->SetCellValue('C13', $this->dataRows['C1C2PropRFConrtibution']);
+        $this->BasicInfoSheet->SetCellValue('C14', $this->dataRows['constructionInflation']);
+        $this->BasicInfoSheet->SetCellValue('C15', $this->dataRows['SchedBInterestRate']);
+        $this->BasicInfoSheet->SetCellValue('C16', $this->dataRows['invenstmentInterest']);
+        $this->BasicInfoSheet->SetCellValue('C17', $this->dataRows['operatingBudget']);
     }
 
     function styleBasicInfo()
@@ -353,7 +315,7 @@ class GenerateXlsx
     {
         self::setupTally();
 
-        $data = $this->conn->prepare($this->tallyQuery);
+        /*$data = $this->conn->prepare($this->tallyQuery);
         $data->bindParam(':planID', $this->planID, PDO::PARAM_INT, 11);
         $data->execute();
 
@@ -455,7 +417,7 @@ class GenerateXlsx
         if (count($dataRows) < 1) {
             echo "0 data";
             exit;
-        }
+        }*/
     }
 
     function setupTally()
@@ -526,6 +488,7 @@ class GenerateXlsx
     function getComparison()
     {
         self::setupComparison();
+
     }
 
     function setupComparison()
@@ -655,10 +618,104 @@ class GenerateXlsx
         }
 
     }
+    
+    function styleComparison()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC1THSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC1THSheet->getColumnDimension("A")->setWidth(5);
+
+        //HEIGHTS
+        $this->SchedC1THSheet->getRowDimension(12)->setRowHeight(60);
+
+        //COLOURING
+        $this->cellColor($this->SchedC1THSheet, 'F15:AI16', 'DAEEF3');
+
+        //FONT
+        $this->SchedC1THSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+
+        //MERGE
+        $this->SchedC1THSheet->mergeCells();
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
+    }
 
     function getTenYears()
     {
         self::setupTenYears();
+    }
+    
+    function styleTenYears()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC1THSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC1THSheet->getColumnDimension("A")->setWidth(5);
+
+        //HEIGHTS
+        $this->SchedC1THSheet->getRowDimension(12)->setRowHeight(60);
+
+        //COLOURING
+        $this->cellColor($this->SchedC1THSheet, 'F15:AI16', 'DAEEF3');
+
+        //FONT
+        $this->SchedC1THSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+
+        //MERGE
+        $this->SchedC1THSheet->mergeCells();
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
     }
 
     function setupTenYears()
@@ -724,6 +781,19 @@ class GenerateXlsx
                 $curRow++;
             }
         }
+
+
+        $this->reportValues['CurrentReplacementCost'] = $this->SchedASheet->getCell('J'.$this->schedATotalsRow)->getCalculatedValue();
+        //// sched A,    K16
+        $this->reportValues['FutureReplacementCost'] = $this->SchedASheet->getCell('K'.$this->schedATotalsRow)->getCalculatedValue();
+        //// sched A,    L16
+        $this->reportValues['CurrentReserveFundCostReq'] = $this->SchedASheet->getCell('L'.$this->schedATotalsRow)->getCalculatedValue();
+        //// sched A,    M16
+        $this->reportValues['FutureReserveFundAcc'] = $this->SchedASheet->getCell('M'.$this->schedATotalsRow)->getCalculatedValue();
+        //// sched A,    N16
+        $this->reportValues['FutureReserveFundReq'] = $this->SchedASheet->getCell('N'.$this->schedATotalsRow)->getCalculatedValue();
+        //// sched A,    O16
+        $this->reportValues['ReserveFundAnnualCon'] = $this->SchedASheet->getCell('O'.$this->schedATotalsRow)->getCalculatedValue();
     }
 
     function setupScheduleA()
@@ -880,6 +950,53 @@ class GenerateXlsx
     function setupScheduleB()
     {
         $this->SchedBSheet->SetCellValue('A2', '');
+    }
+    
+    function styleScheduleB()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC1THSheet->getStyle('A12:AI'.$this->totalASLContributionsSpecialLeviesRow)->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC1THSheet->getColumnDimension("A")->setWidth(5);
+
+        //HEIGHTS
+        $this->SchedC1THSheet->getRowDimension(12)->setRowHeight(60);
+
+        //COLOURING
+        $this->cellColor($this->SchedC1THSheet, 'F15:AI16', 'DAEEF3');
+
+        //FONT
+        $this->SchedC1THSheet->getStyle('C12:E12')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM,
+                'wrap' => true
+            ),
+            'font' => array(
+                'bold' => true,
+                'size' => 10
+            )
+        ));
+
+        //MERGE
+        $this->SchedC1THSheet->mergeCells();
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
     }
 
     function getScheduleC1TH()
@@ -1461,51 +1578,12 @@ class GenerateXlsx
 
 
 
-        //CHART SETUP
-        $dataSetLabel = array(
-            new PHPExcel_Chart_DataSeriesValues('String', 'Sched. C.1 TH$A$' . $this->totalExpendituresRow, NULL, 1)
-            //new \PHPExcel_Chart_DataSeriesValues('String', 'Data!$E$1', NULL, 1),
-        );
-
-        $xAxis = array(
-            new PHPExcel_Chart_DataSeriesValues('Number', 'Sched. C.1 TH$F$12:$AI$12', NULL, 30),
-        );
-
-        $dataSetValues = array(
-            new PHPExcel_Chart_DataSeriesValues('Number', 'Sched. C.1 TH$F$' . $this->totalExpendituresRow . ':$AI$' . $this->totalExpendituresRow, NULL, 30)
-            //new \PHPExcel_Chart_DataSeriesValues('Number', 'Sched. C.1 TH!$E$2:$E$91', NULL, 90),
-        );
-
-        $dataSet = new PHPExcel_Chart_DataSeries(
-            PHPExcel_Chart_DataSeries::TYPE_LINECHART,
-            PHPExcel_Chart_DataSeries::GROUPING_STANDARD,
-            range(0, count($dataSetValues)-1),
-            $dataSetLabel,
-            $xAxis,
-            $dataSetValues
-        );
-        $title = new PHPExcel_Chart_Title('Sched. C.1 TH');
-        $plotArea = new PHPExcel_Chart_PlotArea(NULL, array($dataSet));
-        $legend = new PHPExcel_Chart_Legend(PHPExcel_Chart_Legend::POSITION_BOTTOM, NULL, false);
-        $chart = new PHPExcel_Chart(
-            'chart1',
-            $title,
-            $legend,
-            $plotArea,
-            true,
-            0,
-            NULL,
-            NULL
-        );
-        $chart->setTopLeftPosition('A1');
-        $chart->setBottomRightPosition('I11');
-        $this->SchedC1CTFSheet->addChart($chart);
 
     }
 
     function styleScheduleC1TH()
     {
-                $allBorders = array(
+        $allBorders = array(
             'borders' => array(
                 'inside' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN,
@@ -2120,11 +2198,6 @@ class GenerateXlsx
         $this->SchedC1THSheet->mergeCells('A'.($this->smallTable1To15Start+10).':R'.($this->smallTable1To15Start+10));
         $this->SchedC1THSheet->mergeCells('A'.($this->smallTable16To30Start+10).':R'.($this->smallTable16To30Start+10));
 
-        //NUMBER FORMATS
-        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
-        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
-        //$this->dummp($objPHPExcel->getSheet(6)->getStyle('F142')->getNumberFormat()->getFormatCode());
-
         $this->SchedC1THSheet->getStyle('F11:AI11')->getNumberFormat()->setFormatCode('0%');
         $this->SchedC1THSheet->getStyle('F14:AI14')->getNumberFormat()->setFormatCode('"$"#,##0;[Red]\\-"$"#,##0');
         $this->SchedC1THSheet->getStyle('E15:AI'.$this->totalASLContributionsSpecialLeviesRow)->getNumberFormat()->setFormatCode('_-* "$"#,##0_-;[Red]\\-* "$"#,##0_-;_-* "-"??_-;_-@_-');
@@ -2239,6 +2312,159 @@ class GenerateXlsx
         $this->SchedC1CTFSheet->SetCellValue( 'J' . 35, '=AVERAGE(J4:J33)');
         $this->SchedC1CTFSheet->SetCellValue( 'K' . 35, '=AVERAGE(K4:K33)');
         $this->SchedC1CTFSheet->SetCellValue( 'L' . 35, '=AVERAGE(L4:L33)');
+
+    }
+
+    function styleScheduleC1CTF()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC1CTFSheet->getStyle('A1:L35')->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC1CTFSheet->getColumnDimension("A")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("B")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("C")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("D")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("E")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("F")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("G")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("H")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("I")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("J")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("K")->setWidth(14);
+        $this->SchedC1CTFSheet->getColumnDimension("L")->setWidth(14);
+
+        //HEIGHTS
+        $this->SchedC1CTFSheet->getRowDimension(1)->setRowHeight(26);
+        $this->SchedC1CTFSheet->getRowDimension(2)->setRowHeight(30);
+        $this->SchedC1CTFSheet->getRowDimension(3)->setRowHeight(58);
+        foreach(range(4, 33) as $i)
+        {
+            $this->SchedC1CTFSheet->getRowDimension($i)->setRowHeight(15);
+        }
+        $this->SchedC1CTFSheet->getRowDimension(34)->setRowHeight(20);
+        $this->SchedC1CTFSheet->getRowDimension(35)->setRowHeight(15);
+
+        //COLOURING
+        $this->cellColor($this->SchedC1CTFSheet, 'A1:L1', 'EBF1DE');
+        $this->cellColor($this->SchedC1CTFSheet, 'A2:L3', 'DCE6F1');
+        $this->cellColor($this->SchedC1CTFSheet, 'A34:L35', 'EBF1DE');
+
+        //FONT
+        $this->SchedC1CTFSheet->getStyle('A1:C1')->applyFromArray(array(
+        'alignment' => array(
+            'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+        ),
+        'font' => array(
+            'size' => 11
+        )
+    ));
+        $this->SchedC1CTFSheet->getStyle('D1')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 14
+            )
+        ));
+        $this->SchedC1CTFSheet->getStyle('A2:L2')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 10,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1CTFSheet->getStyle('A3')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC1CTFSheet->getStyle('A4:A33')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1CTFSheet->getStyle('B4:L35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC1CTFSheet->getStyle('A34:A35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC1CTFSheet->getStyle('D4')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 8
+            )
+        ));
+
+
+        //MERGE
+        $this->SchedC1CTFSheet->mergeCells('A1:B1');
+        $this->SchedC1CTFSheet->mergeCells('D1:L1');
+        foreach(range('B','L') as $i)
+        {
+            $this->SchedC1CTFSheet->mergeCells($i.'2:'.$i.'3');
+        }
+        $this->SchedC1CTFSheet->mergeCells('A34:B34');
+        $this->SchedC1CTFSheet->mergeCells('A35:C35');
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(7)->getStyle('L7')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC1CTFSheet->getStyle('B4:C35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC1CTFSheet->getStyle('D4:D33')->getNumberFormat()->setFormatCode('0.00%');
+        $this->SchedC1CTFSheet->getStyle('E4:J35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC1CTFSheet->getStyle('K4:K35')->getNumberFormat()->setFormatCode('"$"#,##0.00');
+        $this->SchedC1CTFSheet->getStyle('L4:L35')->getNumberFormat()->setFormatCode('"$"#,##0');
+
+
+
+
 
     }
 
@@ -3540,6 +3766,154 @@ class GenerateXlsx
         $this->SchedC2CFTSheet->SetCellValue( 'L' . 35, '=AVERAGE(L4:L33)');
     }
 
+    function styleScheduleC2CTF()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC2CFTSheet->getStyle('A1:L35')->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC2CFTSheet->getColumnDimension("A")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("B")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("C")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("D")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("E")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("F")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("G")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("H")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("I")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("J")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("K")->setWidth(14);
+        $this->SchedC2CFTSheet->getColumnDimension("L")->setWidth(14);
+
+        //HEIGHTS
+        $this->SchedC2CFTSheet->getRowDimension(1)->setRowHeight(26);
+        $this->SchedC2CFTSheet->getRowDimension(2)->setRowHeight(30);
+        $this->SchedC2CFTSheet->getRowDimension(3)->setRowHeight(58);
+        foreach(range(4, 33) as $i)
+        {
+            $this->SchedC2CFTSheet->getRowDimension($i)->setRowHeight(15);
+        }
+        $this->SchedC2CFTSheet->getRowDimension(34)->setRowHeight(20);
+        $this->SchedC2CFTSheet->getRowDimension(35)->setRowHeight(15);
+
+        //COLOURING
+        $this->cellColor($this->SchedC2CFTSheet, 'A1:L1', 'EBF1DE');
+        $this->cellColor($this->SchedC2CFTSheet, 'A2:L3', 'DCE6F1');
+        $this->cellColor($this->SchedC2CFTSheet, 'A34:L35', 'EBF1DE');
+
+        //FONT
+        $this->SchedC2CFTSheet->getStyle('A1:C1')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('D1')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 14
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('A2:L2')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 10,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('A3')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('A4:A33')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('B4:L35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC2CFTSheet->getStyle('A34:A35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC2CFTSheet->getStyle('D4')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 8
+            )
+        ));
+
+
+        //MERGE
+        $this->SchedC2CFTSheet->mergeCells('A1:B1');
+        $this->SchedC2CFTSheet->mergeCells('D1:L1');
+        foreach(range('B','L') as $i)
+        {
+            $this->SchedC2CFTSheet->mergeCells($i.'2:'.$i.'3');
+        }
+        $this->SchedC2CFTSheet->mergeCells('A34:B34');
+        $this->SchedC2CFTSheet->mergeCells('A35:C35');
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(7)->getStyle('L7')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC2CFTSheet->getStyle('B4:C35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC2CFTSheet->getStyle('D4:D33')->getNumberFormat()->setFormatCode('0.00%');
+        $this->SchedC2CFTSheet->getStyle('E4:J35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC2CFTSheet->getStyle('K4:K35')->getNumberFormat()->setFormatCode('"$"#,##0.00');
+        $this->SchedC2CFTSheet->getStyle('L4:L35')->getNumberFormat()->setFormatCode('"$"#,##0');
+    }
+
     function getScheduleC3UN()
     {
         self::setupScheduleC3UN();
@@ -4834,6 +5208,154 @@ class GenerateXlsx
         $this->SchedC3CFTSheet->SetCellValue( 'J' . 35, '=AVERAGE(J4:J33)');
         $this->SchedC3CFTSheet->SetCellValue( 'K' . 35, '=AVERAGE(K4:K33)');
         $this->SchedC3CFTSheet->SetCellValue( 'L' . 35, '=AVERAGE(L4:L33)');
+    }
+
+    function styleScheduleC3CTF()
+    {
+        $allBorders = array(
+            'borders' => array(
+                'inside' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array( 'rgb' => 'BFBFBF')
+                ),
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ),
+            )
+        );
+        //OUTLINE
+        $this->SchedC3CFTSheet->getStyle('A1:L35')->applyFromArray($allBorders);
+
+        //WIDTHS
+        $this->SchedC3CFTSheet->getColumnDimension("A")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("B")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("C")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("D")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("E")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("F")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("G")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("H")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("I")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("J")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("K")->setWidth(14);
+        $this->SchedC3CFTSheet->getColumnDimension("L")->setWidth(14);
+
+        //HEIGHTS
+        $this->SchedC3CFTSheet->getRowDimension(1)->setRowHeight(26);
+        $this->SchedC3CFTSheet->getRowDimension(2)->setRowHeight(30);
+        $this->SchedC3CFTSheet->getRowDimension(3)->setRowHeight(58);
+        foreach(range(4, 33) as $i)
+        {
+            $this->SchedC3CFTSheet->getRowDimension($i)->setRowHeight(15);
+        }
+        $this->SchedC3CFTSheet->getRowDimension(34)->setRowHeight(20);
+        $this->SchedC3CFTSheet->getRowDimension(35)->setRowHeight(15);
+
+        //COLOURING
+        $this->cellColor($this->SchedC3CFTSheet, 'A1:L1', 'EBF1DE');
+        $this->cellColor($this->SchedC3CFTSheet, 'A2:L3', 'DCE6F1');
+        $this->cellColor($this->SchedC3CFTSheet, 'A34:L35', 'EBF1DE');
+
+        //FONT
+        $this->SchedC3CFTSheet->getStyle('A1:C1')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('D1')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 14
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('A2:L2')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true
+            ),
+            'font' => array(
+                'size' => 10,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('A3')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('A4:A33')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('B4:L35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11
+            )
+        ));
+
+        $this->SchedC3CFTSheet->getStyle('A34:A35')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_BOTTOM
+            ),
+            'font' => array(
+                'size' => 11,
+                'bold' => true
+            )
+        ));
+        $this->SchedC3CFTSheet->getStyle('D4')->applyFromArray(array(
+            'alignment' => array(
+                'horizontal' =>PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'font' => array(
+                'size' => 8
+            )
+        ));
+
+
+        //MERGE
+        $this->SchedC3CFTSheet->mergeCells('A1:B1');
+        $this->SchedC3CFTSheet->mergeCells('D1:L1');
+        foreach(range('B','L') as $i)
+        {
+            $this->SchedC3CFTSheet->mergeCells($i.'2:'.$i.'3');
+        }
+        $this->SchedC3CFTSheet->mergeCells('A34:B34');
+        $this->SchedC3CFTSheet->mergeCells('A35:C35');
+
+        //NUMBER FORMATS
+        //$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        //$objPHPExcel = $objReader->load('Docs/template.xlsx');
+        //$this->dummp($objPHPExcel->getSheet(7)->getStyle('L7')->getNumberFormat()->getFormatCode());
+
+        $this->SchedC3CFTSheet->getStyle('B4:C35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC3CFTSheet->getStyle('D4:D33')->getNumberFormat()->setFormatCode('0.00%');
+        $this->SchedC3CFTSheet->getStyle('E4:J35')->getNumberFormat()->setFormatCode('"$"#,##0');
+        $this->SchedC3CFTSheet->getStyle('K4:K35')->getNumberFormat()->setFormatCode('"$"#,##0.00');
+        $this->SchedC3CFTSheet->getStyle('L4:L35')->getNumberFormat()->setFormatCode('"$"#,##0');
     }
 
     function save()
