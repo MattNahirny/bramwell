@@ -15,11 +15,12 @@ class GenerateXlsx
         $this->planID = $planID;
         $this->PHPExcel = new PHPExcel();
         $this->allTallyData = array();
+        $this->allBasicData = array();
         $this->numComponents = 0;
         $this->allComponents = array();
         //QUERIES TO DB
         $this->basicInfoQuery = 'SELECT * FROM `basicinfo` Where PlanId = :planID';
-        /*$this->tallyQuery = 'SELECT levelone.Name AS "l1Name", levelfour.Name AS "l4Name", plancomponent.YearAcquired, levelfour.ExpectedLifespan, plancomponent.NumUnits, plancomponent.UnitOfMeasure, levelfour.Cost
+        $this->tallyQuery = 'SELECT levelone.Name AS "l1Name", levelfour.Name AS "l4Name", plancomponent.YearAcquired, levelfour.ExpectedLifespan, plancomponent.NumUnits, plancomponent.UnitOfMeasure, levelfour.Cost
                                 FROM plan
                                 INNER JOIN plancomponent
                                 ON plan.PlanId = plancomponent.PlanId
@@ -31,7 +32,10 @@ class GenerateXlsx
                                 ON levelthree.LevelTwoId = leveltwo.LevelTwoId
 	                            INNER JOIN levelone
                                 ON leveltwo.LevelOneId = levelone.LevelOneId
-                                WHERE plan.PlanId = :planID';*/
+                                WHERE plan.PlanId = :planID';
+        $this->planQuery = 'SELECT StrataNumber, NumResidentialStrataLots, EffectiveDate, CurrentReportYear FROM plan WHERE PlanId = :planID';
+        $this->schedBQuery = 'SELECT FiscalYearEnd FROM schedule_b WHERE PlanId = :planID';
+
         //ROWS OF IMPORTANT DATA CELLS
         $this->schedATotalsRow = 0;
         $this->totalExpendituresRow = 0;
@@ -108,37 +112,35 @@ class GenerateXlsx
         $this->SchedC3UNSheet = $this->PHPExcel->createSheet();
         $this->SchedC3CFTSheet = $this->PHPExcel->createSheet();
     }
-    function getBasicInfoFromDB($conn, $planId)
+
+    function getBasicInfoFromDB($planId)
     {
-        $data = $this->conn->prepare($this->BasicInfoQuery);
+        $data1 = $this->conn->prepare($this->basicInfoQuery);
+        $data1->bindParam(':planID', $planId, PDO::PARAM_INT, 11);
+        $data1->execute();
+
+        $r1 = $data1->fetch(PDO::FETCH_ASSOC);
+
+        $data2 = $this->conn->prepare($this->planQuery);
+        $data2->bindParam(':planID', $planId, PDO::PARAM_INT, 11);
+        $data2->execute();
+
+        $r2 = $data2->fetch(PDO::FETCH_ASSOC);
+
+        $this->allBasicData[0] = $r1;
+        $this->allBasicData[1] = $r2;
+    }
+
+    function getTallyInfoFromDB($planId)
+    {
+        $data = $this->conn->prepare($this->tallyQuery);
         $data->bindParam(':planID', $planId, PDO::PARAM_INT, 11);
         $data->execute();
-        $dataRows = array();
-        $r = $data->fetch(PDO::FETCH_ASSOC);
 
-        $r['strata'] = 'Strata ID';
-        $r['numLots'] = 20;
-        $r['entUnits'] = 0;
-        $r['amenities'] = 0;
-        $r['yearAcquired'] = 1970;
-        $r['currentYear'] = 2016;
-        $r['fiscalYearEnd'] = '28-feb';
-        $r['THCurApprovedIncrease'] = 5000;
-        $r['THYr1PropIncrease'] = 0;
-        $r['C1C2proposedContribution'] = 0.05;
-        $r['C3proposedContribution'] = '1%';
-        $r['C1C2PropRFConrtibution'] = 0;
-        $r['constructionInflation'] = '3%';
-        $r['SchedBInterestRate'] = 0;
-        $r['invenstmentInterest'] = '1%';
-        $r['operatingBudget'] = '12345';
-
-        $this->dataRows = $r;
-        $this->dummp($this->dataRows);
-    }
-    function getTallyInfoFromDB($conn, $planId)
-    {
-        
+        while($r = $data->fetch(PDO::FETCH_ASSOC))
+        {
+            $this->allTallyData[] = $r;
+        }
     }
 
     function dummp($data) {
@@ -209,23 +211,18 @@ class GenerateXlsx
     function getBasicInfo()
     {
         self::setupBasicInfo();
-        $this->getBasicInfoFromDB($this->conn, $this->planID);
-        $this->BasicInfoSheet->SetCellValue('C2', $this->dataRows['strata']);
-        $this->BasicInfoSheet->SetCellValue('C3', $this->dataRows['numLots']);
-        $this->BasicInfoSheet->SetCellValue('C4', $this->dataRows['entUnits']);
-        $this->BasicInfoSheet->SetCellValue('C5', $this->dataRows['amenities']);
-        $this->BasicInfoSheet->SetCellValue('C6', $this->dataRows['yearAcquired']);
-        $this->BasicInfoSheet->SetCellValue('C7', $this->dataRows['currentYear']);
-        $this->BasicInfoSheet->SetCellValue('C8', $this->dataRows['fiscalYearEnd']);
-        $this->BasicInfoSheet->SetCellValue('C9', $this->dataRows['THCurApprovedIncrease']);
-        $this->BasicInfoSheet->SetCellValue('C10', $this->dataRows['THYr1PropIncrease']);
-        $this->BasicInfoSheet->SetCellValue('C11', $this->dataRows['C1C2proposedContribution']);
-        $this->BasicInfoSheet->SetCellValue('C12', $this->dataRows['C3proposedContribution']);
-        $this->BasicInfoSheet->SetCellValue('C13', $this->dataRows['C1C2PropRFConrtibution']);
-        $this->BasicInfoSheet->SetCellValue('C14', $this->dataRows['constructionInflation']);
-        $this->BasicInfoSheet->SetCellValue('C15', $this->dataRows['SchedBInterestRate']);
-        $this->BasicInfoSheet->SetCellValue('C16', $this->dataRows['invenstmentInterest']);
-        $this->BasicInfoSheet->SetCellValue('C17', $this->dataRows['operatingBudget']);
+        $this->getBasicInfoFromDB($this->planID);
+        $this->BasicInfoSheet->SetCellValue('C2', $this->allBasicData[1]['StrataNumber']);
+        $this->BasicInfoSheet->SetCellValue('C3', $this->allBasicData[1]['NumResidentialStrataLots']);
+        $this->BasicInfoSheet->SetCellValue('C6', $this->allBasicData[1]['EffectiveDate']);
+        $this->BasicInfoSheet->SetCellValue('C7', $this->allBasicData[0]['CurrentReportYear']);
+        $this->BasicInfoSheet->SetCellValue('C9', $this->allBasicData[0]['CurrentYearApprovedAnnualRFContributionIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C10', $this->allBasicData[0]['Year1ApprovedAnnualRFContributionIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C11', $this->allBasicData[0]['C1C2Year1Proposed_ContributionIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C12', $this->allBasicData[0]['C3Year1ProposedContributionIncrease']);
+        $this->BasicInfoSheet->SetCellValue('C13', $this->allBasicData[0]['C1C2Year1Proposed_RFContribution']);
+        $this->BasicInfoSheet->SetCellValue('C14', $this->allBasicData[0]['ConstructionInflationRate']);
+        $this->BasicInfoSheet->SetCellValue('C16', $this->allBasicData[0]['InvestmentInterestRate']);
     }
 
     function styleBasicInfo()
@@ -315,54 +312,16 @@ class GenerateXlsx
     {
         self::setupTally();
 
-        /*$data = $this->conn->prepare($this->tallyQuery);
-        $data->bindParam(':planID', $this->planID, PDO::PARAM_INT, 11);
-        $data->execute();
-
-        while($r = $data->fetch(PDO::FETCH_ASSOC))
-        {
-            //Not in DB yet
-            $r['lastConducted'] = 0;
-            //Not in DB yet
-            $r['observedCondition'] = 0;
-            $r['remainingLifeSpan'] = 0;
-            $r['firstWorkPending'] = 0;
-            //All repairs not in DB
-            $r['firstRepair'] = 0;
-            $r['secondRepair'] = 0;
-            $r['thirdRepair'] = 0;
-            $r['fourRepair'] = 0;
-            $r['fifthRepair'] = 0;
-            //All replacement not in DB
-            $r['firstReplacement'] = $r['firstWorkPending'];
-            $r['secondReplacement'] = $r['firstReplacement'] + $r['ExpectedLifespan'];
-            $r['thirdReplacement'] = $r['secondReplacement'] + $r['ExpectedLifespan'];
-            $r['fourthReplacement'] = $r['thirdReplacement'] + $r['ExpectedLifespan'];
-            $r['fifthReplacement'] = $r['fourthReplacement'] + $r['ExpectedLifespan'];
-            //Phased info not in DB
-            $r['replacementPhaseA'] = 0;
-            $r['replacementPhaseB'] = 0;
-            $r['replacementPhaseC'] = 0;
-            $r['replacementPhaseD'] = 0;
-            //Not in DB yet
-            $r['investmentInterestRate'] = 0;
-            $r['percentOfRepair'] = '100%';
-            $r['currentReplacementCost'] = ($r['NumUnits'] * $r['Cost']) * $r['percentOfRepair'];
-            $r['futureReplacementCost'] = $r['currentReplacementCost'] * pow((1 + $r['investmentInterestRate']), $r['remainingLifeSpan']);
-            $r['currentReserveFundRequirements'] = $r['currentReplacementCost'] * ($r['observedCondition'] / $r['ExpectedLifespan']);
-            $r['futureReserveFundAccumulation'] = $r['currentReserveFundRequirements'] * pow((1 + $r['investmentInterestRate']), $r['remainingLifeSpan']);
-            $r['futureReserveFundRequirements'] = $r['futureReplacementCost'] - $r['futureReserveFundAccumulation'];
-            $r['annualReserveFundRequirements'] = $r['futureReserveFundRequirements'] * ($r['investmentInterestRate'] / pow((1 + $r['investmentInterestRate']), ($r['remainingLifeSpan'] - 1)));
-
-
-
-            $dataRows[] = $r;
-        }
-        $this->allTallyData = $dataRows;
-        //$this->dummp($dataRows);
         $levelone = '';
         $curRow = '3';
-        foreach ($dataRows as $index => $array) {
+        $this->getTallyInfoFromDB($this->planID);
+
+        if (count($this->allTallyData) < 1) {
+            echo "0 data";
+            exit;
+        }
+
+        foreach ($this->allTallyData as $index => $array) {
             if ($levelone != $array['l1Name']) {
                 $levelone = $array['l1Name'];
                 $this->TallySheet->SetCellValue('A' . $curRow, $levelone);
@@ -371,29 +330,15 @@ class GenerateXlsx
             } else {
                 $this->TallySheet->SetCellValue('B' . $curRow, $array['l4Name']);
                 $this->TallySheet->SetCellValue('C' . $curRow, '=\'Basic Info\'!$C$6');
-                $this->TallySheet->SetCellValue('D' . $curRow, $array['lastConducted']);
                 $this->TallySheet->SetCellValue('E' . $curRow, $array['ExpectedLifespan']);
-                $this->TallySheet->SetCellValue('F' . $curRow, $array['observedCondition']);
+                $this->TallySheet->SetCellValue('F' . $curRow, 0);
                 $this->TallySheet->SetCellValue('G' . $curRow, '=E'. $curRow . '-F'. $curRow);
                 $this->TallySheet->SetCellValue('H' . $curRow, '=\'Basic Info\'!$C$7+Tally!G'. $curRow);
-                $this->TallySheet->SetCellValue('I' . $curRow, $array['firstRepair']);
-                $this->TallySheet->SetCellValue('J' . $curRow, $array['secondRepair']);
-                $this->TallySheet->SetCellValue('K' . $curRow, $array['thirdRepair']);
-                $this->TallySheet->SetCellValue('L' . $curRow, $array['fourRepair']);
-                $this->TallySheet->SetCellValue('M' . $curRow, $array['fifthRepair']);
                 $this->TallySheet->SetCellValue('N' . $curRow, '=H'. $curRow);
-                $this->TallySheet->SetCellValue('O' . $curRow, $array['secondReplacement']);
-                $this->TallySheet->SetCellValue('P' . $curRow, $array['thirdReplacement']);
-                $this->TallySheet->SetCellValue('Q' . $curRow, $array['fourthReplacement']);
-                $this->TallySheet->SetCellValue('R' . $curRow, $array['fifthReplacement']);
-                $this->TallySheet->SetCellValue('S' . $curRow, $array['replacementPhaseA']);
-                $this->TallySheet->SetCellValue('T' . $curRow, $array['replacementPhaseB']);
-                $this->TallySheet->SetCellValue('U' . $curRow, $array['replacementPhaseC']);
-                $this->TallySheet->SetCellValue('V' . $curRow, $array['replacementPhaseD']);
                 $this->TallySheet->SetCellValue('W' . $curRow, $array['NumUnits']);
                 $this->TallySheet->SetCellValue('X' . $curRow, $array['UnitOfMeasure']);
                 $this->TallySheet->SetCellValue('Y' . $curRow, $array['Cost']);
-                $this->TallySheet->SetCellValue('Z' . $curRow, $array['percentOfRepair']);
+                $this->TallySheet->SetCellValue('Z' . $curRow, '100%');
                 $this->TallySheet->SetCellValue('AA' . $curRow, '=(Tally!$W'. $curRow .
                     '*Tally!$Y' . $curRow . ')*Z4');
                 $this->TallySheet->SetCellValue('AB' . $curRow, '=AA'. $curRow .
@@ -410,44 +355,14 @@ class GenerateXlsx
                 $curRow++;
                 array_push($this->allComponents, $array['l4Name']);
             }
-            $this->TallySheet->calculateColumnWidths();
         }
 
-        //$this->dummp($this->allComponents);
-        if (count($dataRows) < 1) {
-            echo "0 data";
-            exit;
-        }*/
     }
 
     function setupTally()
     {
         $cellRange1 = range('A', 'Z');
         $cellRange2 = range('A', 'F');
-
-        //SETUP Tally Sheet style
-        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setTextRotation(90);
-        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setWrapText(true);
-        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_BOTTOM);
-        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-        $this->TallySheet->getStyle('B2')->applyFromArray(array('font' => array(
-            'bold' => true,
-            'name' => 'Calibri',
-            'size' => 18)));
-        $this->TallySheet->getStyle('C2:AF2')->applyFromArray(array('font' => array(
-            'bold' => true,
-            'name' => 'Calibri',
-            'size' => 11)));
-
-        //SETUP COLUMN WIDTHS
-        foreach($cellRange1 as $letter)
-        {
-            $this->TallySheet->getColumnDimension($letter)->setAutoSize(true);
-        }
-        foreach($cellRange2 as $letter)
-        {
-            $this->TallySheet->getColumnDimension('A'. $letter)->setAutoSize(true);
-        }
 
         //SETUP Tally Sheet Titles
         $this->TallySheet->SetCellValue('A2', '');
@@ -482,13 +397,29 @@ class GenerateXlsx
         $this->TallySheet->SetCellValue('AD2', 'Future Reserve Fund Accumulation');
         $this->TallySheet->SetCellValue('AE2', 'Future Reserve Fund Requirements');
         $this->TallySheet->SetCellValue('AF2', 'Annual Reserve Fund Requirements');
+    }
+
+    function styleTally()
+    {
+        //SETUP Tally Sheet style
+        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setTextRotation(90);
+        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setWrapText(true);
+        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_BOTTOM);
+        $this->TallySheet->getStyle('C2:AF2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        $this->TallySheet->getStyle('B2')->applyFromArray(array('font' => array(
+            'bold' => true,
+            'name' => 'Calibri',
+            'size' => 18)));
+        $this->TallySheet->getStyle('C2:AF2')->applyFromArray(array('font' => array(
+            'bold' => true,
+            'name' => 'Calibri',
+            'size' => 11)));
 
     }
 
     function getComparison()
     {
         self::setupComparison();
-
     }
 
     function setupComparison()
